@@ -1,0 +1,42 @@
+<div class="container my-4">
+    <div class="row gx-3 align-items-stretch">
+        <!-- Sidebar danh mục -->
+        <aside class="col-md-2 mb-3">
+            <div class="h-100">
+                <div th:replace="components/_category.html"></div>
+            </div>
+        </aside>
+
+        <!-- Carousel + quảng cáo -->
+        <div class="col-md-10 d-flex flex-column">
+            <!-- Carousel và ảnh bên cạnh -->
+            <div class="row gx-3 flex-grow-1 mb-3" style="min-height: 360px;">
+                <!-- Carousel lớn -->
+                <div class="col-md-8 d-flex flex-column">
+                    <div class="h-100">
+                        <div th:replace="components/_carousel.html"></div>
+                    </div>
+                </div>
+
+                <!-- Quảng cáo bên phải -->
+                <div class="col-md-4 d-flex flex-column justify-content-between">
+                    <div class="card border-0 shadow-sm h-100 w-100">
+                        <img th:src="@{/images/promotions/1.png}" class="card-img-top w-100 h-100" alt="Quảng cáo">
+                    </div>
+                    <div class="card border-0 shadow-sm h-100 w-100">
+                        <img th:src="@{/images/promotions/2.png}" class="card-img-top w-100 h-100" alt="Quảng cáo">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid quảng cáo nhỏ -->
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 m-0 w-100 p-0">
+            <div class="col" th:each="i : ${#numbers.sequence(3, 6)}">
+                <div class="card border-0 shadow-sm h-100 w-100">
+                    <img th:src="@{'/images/promotions/' + ${i} + '.png'}" class="card-img-top" alt="Quảng cáo nhỏ">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
