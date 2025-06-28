@@ -1,4 +1,4 @@
-﻿-- Chuyển sang chế độ đơn người dùng để xóa DB nếu đang có kết nối
+﻿
 USE master;
 ALTER DATABASE nhatNgheOnlineDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
 
