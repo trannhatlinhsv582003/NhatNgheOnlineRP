@@ -25,7 +25,7 @@
                             <div class="col-md-3" th:each="p, iStat : ${products}" th:if="${iStat.index} < 4">
                                 <a th:href="@{'/product/detail/' + ${p.productID}}" class="text-decoration-none text-dark">
                                     <div class="card h-100 border shadow-sm">
-                                        <img th:src="@{'/images/products/' + ${p.imageURL}}" class="card-img-top p-3" alt="Ảnh">
+                                        <img th:src="@{'/images/products/' + ${p.imageURL}}" class="card-img-top p-3" height="300" alt="Ảnh">
                                         <div class="card-body">
                                             <h6 class="card-title text-truncate-2" th:text="${p.productName}">Tên sản phẩm</h6>
                                             <p class="text-danger fw-semibold"
@@ -43,9 +43,13 @@
                             <div class="col-md-3" th:each="p, iStat : ${products}" th:if="${iStat.index} >= 4">
                                 <a href="/product/detail/1" class="text-decoration-none text-dark">
                                     <div class="card h-100 border shadow-sm">
-                                        <img th:src="@{'/images/products/' + ${p.imageURL}}" class="card-img-top p-3" alt="Ảnh">
+                                        <img th:src="@{'/images/products/' + ${p.imageURL}}" class="card-img-top p-3" height="300" alt="Ảnh">
                                         <div class="card-body">
-                                            <h6 class="card-title text-truncate-2" th:text="${p.productName}">Tên sản phẩm</h6>
+                                            <h6 class="card-title text-truncate-2"
+    th:text="${p.productName.length() > 25} ? ${p.productName.substring(0, 25)} + '…' : ${p.productName}">
+    Tên sản phẩm
+</h6>
+
                                             <p class="text-danger fw-semibold"
                                                th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + '₫'">Giá</p>
                                         </div>
