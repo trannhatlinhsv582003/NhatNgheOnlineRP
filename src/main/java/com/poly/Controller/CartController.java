@@ -63,27 +63,59 @@ public class CartController {
 
 	// Bước 2: Xác nhận thông tin
 	@GetMapping("/info")
-	public String info(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+	public String info(@AuthenticationPrincipal CustomUserDetails userDetails,
+			@RequestParam(name = "isBuyNow", required = false, defaultValue = "false") boolean isBuyNow,
+			@RequestParam(name = "buyNowOrderId", required = false) Integer buyNowOrderId, Model model) {
+
 		model.addAttribute("user", userDetails.getUser());
-		double totalPrice = cartService.getTotalPrice(userDetails.getUser());
-		model.addAttribute("totalPrice", totalPrice);
+
+		if (isBuyNow && buyNowOrderId != null) {
+			Order buyNowOrder = orderService.findById(buyNowOrderId)
+					.orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng mua ngay"));
+			model.addAttribute("totalPrice", buyNowOrder.getTotalAmount().doubleValue());
+			model.addAttribute("isBuyNow", true);
+			model.addAttribute("buyNowOrderId", buyNowOrderId);
+		} else {
+			double totalPrice = cartService.getTotalPrice(userDetails.getUser());
+			model.addAttribute("totalPrice", totalPrice);
+			model.addAttribute("isBuyNow", false);
+		}
+
 		return "cart/info";
 	}
 
 	@PostMapping("/info/next")
 	public String infoNext(@ModelAttribute("user") User userForm, @RequestParam("shippingFee") int shippingFee,
+			@RequestParam(name = "isBuyNow", defaultValue = "false") boolean isBuyNow,
+			@RequestParam(name = "buyNowOrderId", required = false) Integer buyNowOrderId,
 			RedirectAttributes redirectAttributes) {
+
 		redirectAttributes.addFlashAttribute("user", userForm);
 		redirectAttributes.addFlashAttribute("shippingFee", shippingFee);
-		return "redirect:/cart/checkout";
+
+		String redirectUrl = "redirect:/cart/checkout?isBuyNow=" + isBuyNow;
+		if (buyNowOrderId != null) {
+			redirectUrl += "&buyNowOrderId=" + buyNowOrderId;
+		}
+
+		return redirectUrl;
 	}
 
 	// Bước 3: Chọn phương thức thanh toán
 	@GetMapping("/checkout")
 	public String checkout(@AuthenticationPrincipal CustomUserDetails userDetails, Model model,
-			@ModelAttribute("user") User userForm, @ModelAttribute("shippingFee") Integer shippingFee,
-			@RequestParam(name = "isBuyNow", defaultValue = "false") boolean isBuyNow,
-			@RequestParam(name = "buyNowOrderId", required = false) Integer buyNowOrderId) {
+			@ModelAttribute("user") User userForm,
+			@RequestParam(name = "shippingFee", required = false) Integer shippingFee,
+			@RequestParam(name = "isBuyNow", required = false) Boolean isBuyNowAttr,
+			@RequestParam(name = "buyNowOrderId", required = false) Integer buyNowOrderIdAttr) {
+
+		boolean isBuyNow = (isBuyNowAttr != null) ? isBuyNowAttr : false;
+		Integer buyNowOrderId = buyNowOrderIdAttr;
+
+		if (userForm == null || userForm.getFullName() == null) {
+			userForm = userDetails.getUser();
+		}
+
 		double totalPrice;
 		List<PaymentMethod> paymentMethods = paymentMethodService.findAll();
 
@@ -97,7 +129,6 @@ public class CartController {
 			totalPrice = cartService.getTotalPrice(user);
 		}
 
-		// Nếu shippingFee null (ví dụ mua ngay), dùng mặc định
 		if (shippingFee == null) {
 			shippingFee = 30000;
 		}
@@ -200,19 +231,21 @@ public class CartController {
 			@RequestParam("productId") Integer productId,
 			@RequestParam(name = "quantity", defaultValue = "1") Integer quantity,
 			RedirectAttributes redirectAttributes) {
+
 		Product product = productService.findById(productId)
 				.orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
 
-		// Tạo 1 đơn hàng tạm thời chỉ chứa sản phẩm này
 		User user = userDetails.getUser();
 
+		// Tạo đơn hàng tạm thời
 		Order tempOrder = new Order();
 		tempOrder.setUser(user);
 		tempOrder.setOrderDate(LocalDateTime.now());
 		tempOrder.setStatus("Chờ thanh toán");
 		tempOrder.setShippingAddress(user.getAddress());
-		orderService.save(tempOrder); // lưu để có orderId
+		orderService.save(tempOrder);
 
+		// Thêm sản phẩm vào đơn hàng
 		OrderItem item = new OrderItem();
 		item.setOrder(tempOrder);
 		item.setProduct(product);
@@ -220,8 +253,10 @@ public class CartController {
 		item.setPrice(product.getPrice());
 		orderService.saveOrderItem(item);
 
+		// Truyền user và thông tin mua ngay sang bước info
 		redirectAttributes.addFlashAttribute("user", user);
-		return "redirect:/cart/checkout?isBuyNow=true&buyNowOrderId=" + tempOrder.getOrderID();
+
+		return "redirect:/cart/info?isBuyNow=true&buyNowOrderId=" + tempOrder.getOrderID();
 
 	}
 

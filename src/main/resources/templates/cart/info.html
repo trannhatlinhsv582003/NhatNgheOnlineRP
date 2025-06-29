@@ -60,6 +60,13 @@
 				th:object="${user}">
 				<h6 class="mb-3">Thông tin khách mua hàng</h6>
 
+				<!-- Hidden input -->
+				<input type="hidden" name="shippingFee" id="shippingFeeInput"
+					value="30000" /> <input type="hidden" name="shippingFee"
+					value="30000" /> <input type="hidden" name="isBuyNow"
+					th:value="${isBuyNow}" /> <input type="hidden"
+					name="buyNowOrderId" th:value="${buyNowOrderId}" />
+
 				<!-- Giới tính -->
 				<div class="d-flex mb-3 gap-3">
 					<div class="form-check">
@@ -128,11 +135,6 @@
 					</div>
 				</div>
 
-				<!-- Hidden input để gửi shippingFee -->
-				<input type="hidden" name="shippingFee" id="shippingFeeInput"
-					value="30000" />
-
-
 				<!-- Tổng tiền -->
 				<div class="d-flex justify-content-between align-items-center mb-4">
 					<strong class="fs-4">Tổng thanh toán:</strong> <span
@@ -177,7 +179,7 @@
 			});
 		}
 	}
-	
+
 	function updateShippingFee() {
 		const method = document.getElementById("shippingMethod");
 		const selectedOption = method.options[method.selectedIndex];
