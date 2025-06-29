@@ -61,15 +61,15 @@
 		<!-- Các chức năng (ẩn trên mobile) -->
 		<div
 			class="d-none d-md-flex align-items-center gap-3 text-white flex-wrap justify-content-end">
-			<div class="d-flex align-items-center">
+			<div class="d-none d-md-flex align-items-center">
 				<i class="bi bi-headset fs-5 me-1"></i> <span>Hotline<br>
 					<strong>1900.5301</strong></span>
 			</div>
-			<div class="d-flex align-items-center">
+			<div class="d-none d-md-flex align-items-center">
 				<i class="bi bi-geo-alt fs-5 me-1"></i> <span>Hệ thống<br>
 					<strong>Showroom</strong></span>
 			</div>
-			<div class="d-flex align-items-center">
+			<div class="d-none d-md-flex align-items-center">
 				<i class="bi bi-camera fs-5 me-1"></i> <span>Tra cứu<br>
 					<strong>đơn hàng</strong></span>
 			</div>
@@ -84,7 +84,7 @@
 
 
 			<!-- Đăng nhập Dropdown -->
-			<div class="dropdown">
+			<div class="dropdown" th:if="${currentUser == null}">
 				<button
 					class="btn btn-outline-light d-flex align-items-center dropdown-toggle"
 					id="loginDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -92,31 +92,9 @@
 				</button>
 				<ul class="dropdown-menu dropdown-menu-end shadow"
 					aria-labelledby="loginDropdown">
-
-					<li class="px-3 py-2 small text-muted"
-						th:if="${currentUser == null}">👋 Xin chào, vui lòng đăng
-						nhập</li>
-					<li class="px-3 py-2 text-muted" th:if="${currentUser != null}">👋
-						Xin chào, <strong><span th:text="${currentUser.fullName}">Tên
-								người dùng</span></strong>
-					</li>
-
+					<li class="px-3 py-2 small text-muted">👋 Xin chào, vui lòng
+						đăng nhập</li>
 					<hr class="mt-0 mx-3">
-					<li class="px-3 pb-2 d-flex"><a href="/account"
-						class="text-black text-decoration-none requires-login"><i
-							class="bi bi-person-fill me-1"></i> Thông tin tài khoản</a></li>
-					<li class="px-3 pb-2 d-flex"><a href="/account/order-history"
-						class="text-black text-decoration-none requires-login"><i
-							class="bi bi-clipboard-fill me-1"></i> Đơn hàng của tôi</a></li>
-					<li class="px-3 pb-2 d-flex"><a href="/admin"
-						class="text-black text-decoration-none requires-login"><i
-							class="bi bi-gear-fill me-1"></i> Chức năng quản lý</a></li>
-					<li class="px-3 pb-2 d-flex"><a href="#" id="logoutBtn"
-						class="text-black text-decoration-none"> <i
-							class="bi bi-box-arrow-right me-1"></i> Đăng xuất
-					</a></li>
-
-					<hr class="mx-3">
 					<li class="px-3 pb-2 d-flex">
 						<button class="btn btn-danger w-100" data-bs-toggle="modal"
 							data-bs-target="#loginModal">Đăng nhập</button>
@@ -126,6 +104,45 @@
 					</li>
 				</ul>
 			</div>
+
+			<!-- Nếu đã đăng nhập -->
+			<div class="dropdown" th:if="${currentUser != null}">
+				<a href="#"
+					class=" d-flex align-items-center dropdown-toggle text-white text-decoration-none"
+					id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+					<img
+					th:src="@{${currentUser.imageUrl != null} ? '/images/avatar/' + ${currentUser.imageUrl} : '/images/avatar.jpg'}"
+					class="rounded-circle me-2"
+					style="width: 32px; height: 32px; object-fit: cover;"> <span>
+						<span th:text="${currentUser.fullName}">Tên người dùng</span> <span
+						th:if="${currentUser.role == 'Admin'}" class="fw-bold">(Admin)</span>
+						<span th:if="${currentUser.role == 'Staff'}" class="fw-bold">(Staff)</span>
+				</span>
+				</a>
+				<ul class="dropdown-menu dropdown-menu-end shadow"
+					aria-labelledby="userDropdown">
+					<li class="px-3 py-2">👋 Xin chào, <strong
+						th:text="${currentUser.fullName}">Tên</strong></li>
+					<hr class="mt-0 mx-3">
+					<li class="px-3 pb-2 d-flex"><a href="/account"
+						class="text-black text-decoration-none"><i
+							class="bi bi-person-fill me-1"></i> Thông tin tài khoản</a></li>
+					<li class="px-3 pb-2 d-flex"><a href="/account/order-history"
+						class="text-black text-decoration-none"><i
+							class="bi bi-clipboard-fill me-1"></i> Đơn hàng của tôi</a></li>
+					<!-- Chức năng quản lý chỉ hiện nếu là admin hoặc staff -->
+					<li class="px-3 pb-2 d-flex"
+						th:if="${currentUser.role == 'Admin' or currentUser.role == 'Staff'}">
+						<a href="/admin" class="text-black text-decoration-none"><i
+							class="bi bi-gear-fill me-1"></i> Chức năng quản lý</a>
+					</li>
+					<li class="px-3 pb-2 d-flex"><a href="#" id="logoutBtn"
+						class="text-black text-decoration-none"><i
+							class="bi bi-box-arrow-right me-1"></i> Đăng xuất</a></li>
+				</ul>
+			</div>
+
+
 		</div>
 	</div>
 </div>

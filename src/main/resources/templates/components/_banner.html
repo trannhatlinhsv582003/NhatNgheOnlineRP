@@ -1,7 +1,7 @@
 <div class="container my-4">
     <div class="row gx-3 align-items-stretch">
         <!-- Sidebar danh mục -->
-        <aside class="col-md-2 mb-3">
+        <aside class="d-none d-md-block col-md-2 mb-3">
             <div class="h-100">
                 <div th:replace="components/_category.html"></div>
             </div>
@@ -31,7 +31,7 @@
         </div>
 
         <!-- Grid quảng cáo nhỏ -->
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 m-0 w-100 p-0">
+        <div class="d-none d-md-flex row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 m-0 w-100 p-0">
             <div class="col" th:each="i : ${#numbers.sequence(3, 6)}">
                 <div class="card border-0 shadow-sm h-100 w-100">
                     <img th:src="@{'/images/promotions/' + ${i} + '.png'}" class="card-img-top" alt="Quảng cáo nhỏ">
