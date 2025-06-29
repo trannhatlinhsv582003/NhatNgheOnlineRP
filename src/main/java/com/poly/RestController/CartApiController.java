@@ -21,6 +21,8 @@ public class CartApiController {
 	@PostMapping("/add")
 	public String addToCart(@RequestParam Integer productId, @RequestParam Integer quantity,
 			@AuthenticationPrincipal CustomUserDetails userDetails) {
+		System.out.println("UserDetails: " + userDetails);
+
 		if (userDetails == null) {
 			return "unauthorized";
 		}

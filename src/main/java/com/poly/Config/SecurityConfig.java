@@ -29,6 +29,7 @@ public class SecurityConfig {
 						"/api/**", "/components/**", "/libraries/**", "/search/**", "/auth/**")
 				.permitAll().requestMatchers("/checkout/**", "/user/**", "/cart/**").authenticated().anyRequest()
 				.authenticated())
+				.exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
 				.formLogin(form -> form.loginPage("/").loginProcessingUrl("/login").usernameParameter("email")
 						.passwordParameter("password").successHandler((req, res, auth) -> {
 							res.setStatus(200);
