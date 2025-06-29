@@ -8,27 +8,41 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.poly.Model.Review;
+import com.poly.Model.User;
 import com.poly.Repository.ReviewRepository;
+import com.poly.Repository.UserRepository;
 import com.poly.Service.ReviewService;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
 	@Autowired
-	private ReviewRepository repo;
+	private ReviewRepository reviewRepository;
+	@Autowired
+	private UserRepository userRepository;
 
 	public List<Review> findAll() {
-		return repo.findAll();
+		return reviewRepository.findAll();
 	}
 
 	public Optional<Review> findById(Integer id) {
-		return repo.findById(id);
+		return reviewRepository.findById(id);
+	}
+
+	@Override
+	public User findByEmail(String email) {
+		return userRepository.findByEmail(email);
+	}
+
+	@Override
+	public List<Review> getApprovedReviewsByProduct(Integer productId) {
+		return reviewRepository.findApprovedReviewsByProductId(productId);
 	}
 
 	public Review save(Review review) {
-		return repo.save(review);
+		return reviewRepository.save(review);
 	}
 
 	public void deleteById(Integer id) {
-		repo.deleteById(id);
+		reviewRepository.deleteById(id);
 	}
 }

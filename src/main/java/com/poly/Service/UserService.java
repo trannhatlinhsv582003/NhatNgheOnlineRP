@@ -16,6 +16,8 @@ public interface UserService {
 
 	Optional<User> findById(Integer id);
 
+	User findByEmail(String email);
+
 	User save(User user);
 
 	void deleteById(Integer id);

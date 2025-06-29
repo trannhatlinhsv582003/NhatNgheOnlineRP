@@ -7,7 +7,6 @@
 	th:href="@{/images/logo/logo.png}">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title th:text="${product.productName}">Chi tiết sản phẩm</title>
-
 <link rel="stylesheet"
 	th:href="@{/libraries/bootstrap-5.3.3-dist/css/bootstrap.min.css}">
 <link rel="stylesheet"
@@ -16,12 +15,10 @@
 </head>
 
 <body>
-	<!-- HEADER -->
 	<header class="row">
 		<div th:replace="/components/_menu.html"></div>
 	</header>
 
-	<!-- BODY -->
 	<div class="container py-4">
 		<div class="row bg-white p-5 rounded">
 			<!-- ẢNH SẢN PHẨM -->
@@ -49,31 +46,24 @@
 				</div>
 			</div>
 
-			<!-- THÔNG TIN SẢN PHẨM -->
-			<div class="col-md-7">
+			<div class="col-md-7 d-flex flex-column">
 				<h4 class="fw-bold" th:text="${product.productName}">Tên sản
 					phẩm</h4>
-
-				<!-- Đánh giá (để sau) -->
 				<div class="mb-3 d-flex align-items-center gap-2">
-					<span class="text-warning small">0.0</span> <span
+					<span class="text-warning small" th:text="${averageRating != null} ? ${#numbers.formatDecimal(averageRating, 1, 'COMMA', 1, 'POINT')} : '0.0'">0.0</span> <span
 						class="text-warning">★</span> <a
 						class="text-decoration-none small ms-2" onclick="scrollToReview()"
 						style="cursor: pointer"> Xem đánh giá </a>
 				</div>
 
-				<!-- Giá -->
 				<p class="text-danger fs-4 fw-semibold"
 					th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'">Giá</p>
-
-				<!-- Kho -->
 				<p>
 					<strong>Kho:</strong> <span
 						th:text="${product.stockQuantity > 0 ? 'Còn hàng' : 'Hết hàng'}">Tình
 						trạng</span>
 				</p>
 
-				<!-- Thêm vào giỏ -->
 				<form id="addToCartForm" class="input-group mb-3"
 					style="max-width: 200px;">
 					<input type="number" name="quantity" class="form-control" min="1"
@@ -83,64 +73,131 @@
 						vào giỏ</button>
 				</form>
 
-
-				<!-- Mua ngay -->
 				<div class="d-grid mb-3">
 					<a
 						th:href="@{/cart/buy-now(productId=${product.productID}, quantity=1)}"
 						class="btn btn-danger btn-lg fw-bold requires-login"> <i
 						class="bi bi-lightning-charge-fill me-1"></i> Mua ngay
 					</a>
-
 				</div>
 
 				<hr>
-
-				<!-- Chia sẻ -->
 				<div>
 					<span class="me-2">Chia sẻ:</span> <i class="bi bi-facebook me-2"></i>
 					<i class="bi bi-twitter me-2"></i> <i class="bi bi-share-fill"></i>
 				</div>
+			</div>
+		</div>
 
-				<!-- TABS MÔ TẢ -->
-				<div class="row mt-5">
-					<div class="col-12">
-						<ul class="nav nav-tabs" id="productTab" role="tablist">
-							<li class="nav-item" role="presentation">
-								<button class="nav-link text-black active" id="desc-tab"
-									data-bs-toggle="tab" data-bs-target="#desc" type="button"
-									role="tab">Mô tả</button>
-							</li>
-							<li class="nav-item" role="presentation">
-								<button class="nav-link text-black" id="spec-tab"
-									data-bs-toggle="tab" data-bs-target="#spec" type="button"
-									role="tab">Thông số kỹ thuật</button>
-							</li>
-							<li class="nav-item" role="presentation">
-								<button class="nav-link text-black" id="review-tab"
-									data-bs-toggle="tab" data-bs-target="#review" type="button"
-									role="tab">Đánh giá</button>
-							</li>
-						</ul>
-						<div
-							class="tab-content border border-top-0 p-4 bg-white rounded-bottom"
-							id="productTabContent">
-							<div class="tab-pane fade show active" id="desc" role="tabpanel">
-								<p th:text="${product.description}">Mô tả chi tiết sản phẩm</p>
-							</div>
-							<div class="tab-pane fade" id="spec" role="tabpanel">
-								<p th:utext="${product.specifications}">Thông số kỹ thuật</p>
-							</div>
-							<div class="tab-pane fade" id="review" role="tabpanel">
-								<p>Chưa có đánh giá nào cho sản phẩm này.</p>
-							</div>
-						</div>
-					</div>
+		<div class="row mt-5 gx-4">
+			<div class="col-md-6 ps-0">
+				<div class="bg-white rounded p-5">
+					<h5 class="fw-bold">Mô tả sản phẩm</h5>
+					<p th:text="${product.description}">Mô tả chi tiết sản phẩm</p>
+				</div>
+			</div>
+			<div class="col-md-6 pe-0">
+				<div class="bg-white rounded p-5">
+					<h5 class="fw-bold">Thông số kỹ thuật</h5>
+					<p th:utext="${product.specifications}">Thông số kỹ thuật</p>
 				</div>
 			</div>
 		</div>
 
-		<!-- SẢN PHẨM LIÊN QUAN -->
+		<div class="row mt-5">
+			<div class="col-12 p-0">
+				<div class="bg-white rounded p-5">
+					<h3 class="mb-4" id="review-title">Đánh giá & Nhận xét sản phẩm</h3>
+
+					<!-- Tổng điểm đánh giá -->
+					<div class="d-flex align-items-center mb-4">
+						<h2 class="fw-bold text-warning mb-0"
+							th:text="${averageRating != null} ? ${#numbers.formatDecimal(averageRating, 1, 'COMMA', 1, 'POINT')} : '0.0'">
+							0.0</h2>
+						<div class="ms-2">
+							<!-- Hiển thị số sao trung bình làm tròn -->
+							<div class="text-warning fs-5">
+								<span
+									th:text="${'★'.repeat(T(java.lang.Math).round(averageRating))}">★★★★★</span>
+								<span th:if="${T(java.lang.Math).round(averageRating) < 5}"
+									th:text="${'☆'.repeat(5 - T(java.lang.Math).round(averageRating))}">☆☆</span>
+							</div>
+							<div class="small text-muted"
+								th:text="'(' + ${totalReviews} + ' đánh giá)'">(0 đánh
+								giá)</div>
+						</div>
+					</div>
+
+
+					<!-- Form viết đánh giá: chỉ hiện nếu đã đăng nhập -->
+					<div class="mb-4 border-bottom py-4" th:if="${currentUser != null}">
+						<form id="reviewForm" class="bg-light p-4 rounded border">
+							<div class="mb-2">
+								<label class="form-label">Chọn sao:</label> <select
+									name="rating" class="form-select" required>
+									<option value="">-- Chọn --</option>
+									<option value="5">★★★★★ - Rất hài lòng</option>
+									<option value="4">★★★★☆ - Hài lòng</option>
+									<option value="3">★★★☆☆ - Bình thường</option>
+									<option value="2">★★☆☆☆ - Không thích</option>
+									<option value="1">★☆☆☆☆ - Rất không thích</option>
+								</select>
+
+							</div>
+							<div class="mb-2">
+								<label class="form-label">Nhận xét:</label>
+								<textarea name="comment" class="form-control" rows="3" required></textarea>
+							</div>
+							<input type="hidden" name="productId"
+								th:value="${product.productID}" />
+							<button type="submit" class="btn btn-primary">Gửi đánh
+								giá</button>
+						</form>
+					</div>
+
+					<!-- Nếu chưa đăng nhập -->
+					<div class="alert alert-warning" th:if="${currentUser == null}">
+						Vui lòng <a href="#"
+							class="text-decoration-underline text-primary requires-login">đăng
+							nhập</a> để viết đánh giá.
+					</div>
+
+
+					<!-- Danh sách đánh giá -->
+					<div class="list-group">
+						<div class="list-group-item border-0 border-bottom py-4 px-5"
+							th:each="r : ${reviews}">
+							<div class="d-flex align-items-center mb-2">
+								<div
+									class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-3"
+									style="width: 40px; height: 40px;">
+									<span class="fw-bold text-uppercase"
+										th:text="${#strings.substring(r.user.fullName, 0, 1)}">N</span>
+								</div>
+								<div>
+									<div class="d-flex align-items-center">
+										<span class="fw-semibold me-2" th:text="${r.user.fullName}">Tên
+											người dùng</span> <span class="text-muted small"
+											th:text="'| ' + ${r.createdAt}">Ngày đánh giá</span>
+									</div>
+									<div class="text-warning mb-1">
+										<span th:text="${'★'.repeat(r.rating)}">★★★★★</span> <span
+											th:if="${r.rating < 5}" th:text="${'☆'.repeat(5 - r.rating)}">☆☆</span>
+									</div>
+								</div>
+							</div>
+							<div th:text="${r.comment}">Nội dung đánh giá</div>
+						</div>
+
+						<!-- Nếu không có đánh giá -->
+						<div th:if="${#lists.isEmpty(reviews)}" class="text-muted">
+							Chưa có đánh giá nào cho sản phẩm này.</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
 		<div class="row mt-5">
 			<h4 class="mb-3">Sản phẩm cùng loại</h4>
 			<div class="col-md-3" th:each="p : ${relatedProducts}">
@@ -151,108 +208,147 @@
 					<div class="card-body">
 						<h6 class="card-title text-truncate-2" th:text="${p.productName}">Tên
 							sản phẩm</h6>
-						<p class="text-danger fw-semibold"
-							th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + '₫'">Giá</p>
+						<!-- <p class="text-danger fw-semibold" th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + '₫'">Giá</p>
+               -->
 					</div>
 				</a>
 			</div>
 		</div>
 	</div>
 
-	<!-- FOOTER -->
 	<div th:replace="components/_footer.html"></div>
-
 	<script
 		th:src="@{/libraries/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js}"></script>
 	<script>
-        function scrollToReview() {
-            const tabTrigger = document.querySelector('#review-tab');
-            const tab = new bootstrap.Tab(tabTrigger);
-            tab.show();
+function scrollToReview() {
+    const tabTitle = document.getElementById('review-title');
+    if (tabTitle) {
+        const offsetTop = tabTitle.getBoundingClientRect().top + window.pageYOffset - 150;
+        window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+    }
+}
 
-            const reviewSection = document.querySelector('#productTab');
-            if (reviewSection) {
-                const offsetTop = reviewSection.getBoundingClientRect().top + window.pageYOffset - 100;
-                window.scrollTo({ top: offsetTop, behavior: 'smooth' });
-            }
+document.getElementById('reviewForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+
+    fetch('/product/review', { // ← đường dẫn chính xác
+        method: 'POST',
+        body: new URLSearchParams(formData),
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
         }
-        
-        document.getElementById('addToCartForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const form = e.target;
-            const formData = new FormData(form);
-
-            fetch('/api/cart/add', {
-                method: 'POST',
-                body: new URLSearchParams(formData),
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(res => res.text())
-            .then(result => {
-                if (result === 'success') {
-                    showCustomMessage({
-                        title: 'Thành công',
-                        message: 'Sản phẩm đã được thêm vào giỏ hàng.',
-                        type: 'success'
-                    });
-                    setTimeout(() => {
-                    	location.reload();
-                    }, 2000);
-                } else if (result === 'unauthorized') {
-                    showCustomMessage({
-                        title: 'Bạn chưa đăng nhập',
-                        message: 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.',
-                        type: 'warning'
-                    });
-                } else {
-                    showCustomMessage({
-                        title: 'Lỗi',
-                        message: 'Không thể thêm vào giỏ hàng. Vui lòng thử lại.',
-                        type: 'error'
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Lỗi:', error);
-                showCustomMessage({
-                    title: 'Lỗi kết nối',
-                    message: 'Không thể kết nối đến máy chủ.',
-                    type: 'error'
-                });
+    })
+    .then(res => res.text())
+    .then(result => {
+        if (result === 'success') {
+        	showCustomMessage({
+                title: 'Thành công',
+                message: 'Thêm đánh giá thành công!',
+                type: 'success'
             });
-        });
-
-        // Thay đổi ảnh chính khi chọn thumbnail và thêm hiệu ứng
-        document.addEventListener("DOMContentLoaded", function () {
-            const thumbnails = document.querySelectorAll('.thumbnail-img');
-            const mainImage = document.getElementById('main-image');
-
-            thumbnails.forEach(img => {
-                img.addEventListener('click', function () {
-                    const newSrc = this.getAttribute('data-src');
-                   
-                        mainImage.src = newSrc;
-
-                        // Hiệu ứng nháy trắng cho ảnh chính
-                        mainImage.classList.remove('main-image-flash');
-                        void mainImage.offsetWidth; // Trigger reflow
-                        mainImage.classList.add('main-image-flash');
-              	
-
-                    // Xử lý viền đỏ cho thumbnail được chọn
-                    thumbnails.forEach(th => th.classList.remove('active'));
-                    this.classList.add('active');
-                });
+            setTimeout(() => {
+            	location.reload();
+            }, 2000);
+        } else if (result === 'unauthorized') {
+            showCustomMessage({
+                title: 'Bạn chưa đăng nhập',
+                message: 'Vui lòng đăng nhập để gửi đánh giá.',
+                type: 'warning'
             });
+        } else {
+            alert('Không thể gửi đánh giá. Vui lòng thử lại.');
+            showCustomMessage({
+                title: 'Lỗi',
+                message: 'Không thể gửi đánh giá. Vui lòng thử lại.',
+                type: 'error'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Lỗi:', error);
+        alert('Lỗi kết nối đến máy chủ.');
+    });
+});
 
-            // Đặt mặc định thumbnail đầu tiên được active
-            if (thumbnails.length > 0) {
-                thumbnails[0].classList.add('active');
-            }
+
+document.getElementById('addToCartForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+
+    fetch('/api/cart/add', {
+        method: 'POST',
+        body: new URLSearchParams(formData),
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(res => res.text())
+    .then(result => {
+        if (result === 'success') {
+            showCustomMessage({
+                title: 'Thành công',
+                message: 'Sản phẩm đã được thêm vào giỏ hàng.',
+                type: 'success'
+            });
+            setTimeout(() => {
+            	location.reload();
+            }, 2000);
+        } else if (result === 'unauthorized') {
+            showCustomMessage({
+                title: 'Bạn chưa đăng nhập',
+                message: 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.',
+                type: 'warning'
+            });
+        } else {
+            showCustomMessage({
+                title: 'Lỗi',
+                message: 'Không thể thêm vào giỏ hàng. Vui lòng thử lại.',
+                type: 'error'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Lỗi:', error);
+        showCustomMessage({
+            title: 'Lỗi kết nối',
+            message: 'Không thể kết nối đến máy chủ.',
+            type: 'error'
         });
-    </script>
+    });
+});
+
+// Thay đổi ảnh chính khi chọn thumbnail và thêm hiệu ứng
+document.addEventListener("DOMContentLoaded", function () {
+    const thumbnails = document.querySelectorAll('.thumbnail-img');
+    const mainImage = document.getElementById('main-image');
+
+    thumbnails.forEach(img => {
+        img.addEventListener('click', function () {
+            const newSrc = this.getAttribute('data-src');
+           
+                mainImage.src = newSrc;
+
+                // Hiệu ứng nháy trắng cho ảnh chính
+                mainImage.classList.remove('main-image-flash');
+                void mainImage.offsetWidth; // Trigger reflow
+                mainImage.classList.add('main-image-flash');
+      	
+
+            // Xử lý viền đỏ cho thumbnail được chọn
+            thumbnails.forEach(th => th.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // Đặt mặc định thumbnail đầu tiên được active
+    if (thumbnails.length > 0) {
+        thumbnails[0].classList.add('active');
+    }
+});
+</script>
 
 	<style>
 /* Cố định kích thước ảnh lớn */
