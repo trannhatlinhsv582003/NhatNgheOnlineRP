@@ -1,0 +1,29 @@
+<!-- MODAL: Danh mục -->
+<div class="modal fade" id="categoryModal" tabindex="-1"
+	aria-labelledby="categoryModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-scrollable">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title fw-bold" id="categoryModalLabel">
+					<i class="bi bi-list me-1"></i> Danh mục sản phẩm
+				</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"
+					aria-label="Đóng"></button>
+			</div>
+			<div class="modal-body">
+				<div th:replace="/components/_category.html"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+.category-list a {
+	color: inherit;
+	transition: color 0.2s ease;
+}
+
+.category-list a:hover {
+	color: #e30019;
+}
+</style>
