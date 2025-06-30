@@ -36,7 +36,11 @@ public class QRPayController {
 
 		double amount = order.getTotalAmount().doubleValue();
 
+
+		// Nội dung chuyển khoản: tên + danh sách sản phẩm.
+
 		// Nội dung chuyển khoản: tên + danh sách sản phẩm
+
 		String customerName = order.getUser().getFullName();
 		String productList = order.getOrderItems().stream()
 				.map(item -> item.getProduct().getProductID() + "×" + item.getQuantity())
