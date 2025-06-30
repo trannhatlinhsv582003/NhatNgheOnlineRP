@@ -1,0 +1,49 @@
+@charset "UTF-8";
+
+body {
+    padding-top: 65px !important;
+    margin: 0px;
+    background-color: #ececec;
+}
+.app-red{
+	background-color: #e30019;
+}
+
+.bg-color{
+	background-color: #ececec;
+}
+
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.nav-btn {
+	color: white;
+    transition: color 0.2s ease-in-out;
+}
+.nav-btn:hover{
+	color: #e30019;
+	background-color: white;
+}
+
+a.requires-login::after {
+    content: attr(title);
+    position: absolute;
+    background: #000;
+    color: #fff;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: none;
+}
+
+@keyframes flashWhite {
+    0%   { filter: brightness(100%); }
+    50%  { filter: brightness(150%); }
+    100% { filter: brightness(100%); }
+}
