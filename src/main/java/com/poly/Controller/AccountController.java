@@ -3,6 +3,7 @@ package com.poly.Controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,9 +16,11 @@ import com.poly.Repository.OrderRepository;
 import java.util.List;
 import com.poly.Model.Order;
 
+
 @Controller
 @RequestMapping("/account")
 public class AccountController {
+
 	@Autowired
 	private UserRepository userRepository;
 
@@ -60,6 +63,15 @@ public class AccountController {
 		List<Order> orders = orderRepository.findByUser_UserID(user.getUserID());
 		model.addAttribute("orders", orders);
 		model.addAttribute("user", user);
+
+	@GetMapping
+	public String index() {
+		return ("account/profile");
+	}
+
+	@GetMapping("/order-history")
+	public String orderHistory() {
+
 		return ("account/orderHistory");
 	}
 }

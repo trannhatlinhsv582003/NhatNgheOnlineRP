@@ -114,7 +114,11 @@ public class VNPayController {
 		response.sendRedirect(paymentUrl);
 	}
 
+
 	// Sau khi thanh toán xong.
+
+	// Sau khi thanh toán xong
+
 	@GetMapping("/return")
 	public String vnpReturn(@RequestParam Map<String, String> allParams, Model model) {
 		String responseCode = allParams.get("vnp_ResponseCode");
