@@ -1,21 +1,21 @@
 package com.poly.Controller;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import com.poly.Model.User;
-import com.poly.Repository.UserRepository;
-import com.poly.Repository.OrderRepository;
-import java.util.List;
-import com.poly.Model.Order;
+import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.poly.Model.Order;
+import com.poly.Model.User;
+import com.poly.Repository.OrderRepository;
+import com.poly.Repository.UserRepository;
 
 @Controller
 @RequestMapping("/account")
@@ -64,14 +64,17 @@ public class AccountController {
 		model.addAttribute("orders", orders);
 		model.addAttribute("user", user);
 
-	@GetMapping
-	public String index() {
-		return ("account/profile");
-	}
-
-	@GetMapping("/order-history")
-	public String orderHistory() {
-
 		return ("account/orderHistory");
 	}
+
+//	@GetMapping
+//	public String index() {
+//		return ("account/profile");
+//	}
+//
+//	@GetMapping("/order-history")
+//	public String orderHistory() {
+//
+//		return ("account/orderHistory");
+//	}
 }
