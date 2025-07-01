@@ -34,7 +34,11 @@
 					<div class="account-sidebar p-3">
 						<div class="text-center mb-3">
 							<i class="bi bi-person-circle fs-1"></i>
+
+							<h5 class="mt-2" th:text="${user.fullName}">Nhất Nghệ Online</h5>
+
 							<h5 class="mt-2">Nhất Nghệ Online</h5>
+
 						</div>
 						<nav class="nav flex-column">
 							<a class="nav-link"  th:href="@{/account}"> <i
@@ -53,7 +57,46 @@
 				<div class="col-md-9">
 					<div class="account-content">
 						<h4 class="fw-bold mb-4">Lịch sử đơn hàng</h4>
-						
+
+						<div th:if="${orders != null && !orders.isEmpty()}">
+							<div class="table-responsive">
+								<table class="table table-bordered align-middle">
+									<thead class="table-light">
+										<tr>
+											<th>Mã đơn</th>
+											<th>Ngày đặt</th>
+											<th>Trạng thái</th>
+											<th>Địa chỉ giao</th>
+											<th>Sản phẩm</th>
+											<th>Tổng tiền</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="order : ${orders}">
+											<td th:text="${order.orderID}"></td>
+											<td th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}"></td>
+											<td th:text="${order.status}"></td>
+											<td th:text="${order.shippingAddress}"></td>
+											<td>
+												<ul class="list-unstyled mb-0">
+													<li th:each="item : ${order.orderItems}" class="mb-2 d-flex align-items-center">
+														<img th:src="@{'/images/products/' + ${item.product.imageURL}}" alt="Ảnh" style="width:40px;height:40px;object-fit:cover;border-radius:4px;margin-right:8px;">
+														<span th:text="${item.product.productName}"></span>
+														<span class="mx-2">x</span>
+														<span th:text="${item.quantity}"></span>
+														<span class="ms-2 text-muted" th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
+													</li>
+												</ul>
+											</td>
+											<td class="fw-bold text-danger" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + '₫'"></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div th:if="${orders == null || orders.isEmpty()}">
+							<div class="alert alert-info">Bạn chưa có đơn hàng nào.</div>
+						</div>
 					</div>
 				</div>
 			</div>

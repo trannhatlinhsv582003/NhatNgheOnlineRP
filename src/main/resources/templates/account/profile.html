@@ -34,7 +34,11 @@
 					<div class="account-sidebar p-3">
 						<div class="text-center mb-3">
 							<i class="bi bi-person-circle fs-1"></i>
+
+							<h5 class="mt-2" th:text="${user.fullName}">Nhất Nghệ Online</h5>
+
 							<h5 class="mt-2">Nhất Nghệ Online</h5>
+
 						</div>
 						<nav class="nav flex-column">
 							<a class="nav-link active" href="#"> <i
@@ -53,14 +57,44 @@
 				<div class="col-md-9">
 					<div class="account-content">
 						<h4 class="fw-bold mb-4">Thông tin tài khoản</h4>
+
+						<form th:action="@{/account}" th:object="${user}" method="post">
+							<div class="mb-3">
+								<label class="form-label">Họ Tên</label>
+								<input type="text" class="form-control" th:field="*{fullName}">
+
 						<form>
 							<div class="mb-3">
 								<label class="form-label">Họ Tên</label> <input type="text"
 									class="form-control" value="Nhất Nghệ Online">
+
 							</div>
 							<div class="mb-3">
 								<label class="form-label d-block">Giới tính</label>
 								<div class="form-check form-check-inline">
+
+									<input class="form-check-input" type="radio" name="gender" id="male" th:field="*{gender}" th:value="true"> 
+									<label class="form-check-label" for="male">Nam</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="gender" id="female" th:field="*{gender}" th:value="false"> 
+									<label class="form-check-label" for="female">Nữ</label>
+								</div>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Số điện thoại</label>
+								<input type="text" class="form-control" th:field="*{phone}">
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Email</label>
+								<input type="email" class="form-control" th:field="*{email}" disabled>
+							</div>
+							<div class="mb-4">
+								<label class="form-label">Ngày sinh</label>
+								<input type="date" class="form-control" th:field="*{birthDay}">
+							</div>
+							<button type="submit" class="btn btn-danger">Lưu thay đổi</button>
+
 									<input class="form-check-input" type="radio" name="gender"
 										id="male" checked> <label class="form-check-label"
 										for="male">Nam</label>
@@ -93,6 +127,7 @@
 							</div>
 							<button type="submit" class="btn btn-danger">Lưu thay
 								đổi</button>
+
 						</form>
 					</div>
 				</div>
