@@ -1,0 +1,31 @@
+<!-- Custom Message Modal -->
+<div class="modal fade" id="customMessageModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center rounded-4 p-4">
+      <div id="customMessageIcon" class="mb-3 fs-1"></div>
+      <h5 id="customMessageTitle" class="fw-bold mb-2">Thông báo</h5>
+      <p id="customMessageBody" class="mb-3">Nội dung thông báo ở đây...</p>
+      <button type="button" class="btn btn-primary w-100" data-bs-dismiss="modal">ĐÓNG</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function showCustomMessage({ title = 'Thông báo', message = '', type = 'info' }) {
+    const modal = new bootstrap.Modal(document.getElementById('customMessageModal'));
+    
+    // Biểu tượng và màu dựa vào type
+    const iconMap = {
+        success: '<i class="bi bi-check-circle-fill text-success"></i>',
+        error: '<i class="bi bi-x-circle-fill text-danger"></i>',
+        warning: '<i class="bi bi-exclamation-triangle-fill text-warning"></i>',
+        info: '<i class="bi bi-info-circle-fill text-primary"></i>'
+    };
+
+    document.getElementById('customMessageTitle').innerText = title;
+    document.getElementById('customMessageBody').innerText = message;
+    document.getElementById('customMessageIcon').innerHTML = iconMap[type] || iconMap.info;
+
+    modal.show();
+}
+</script>
