@@ -35,9 +35,9 @@
 						<div class="text-center mb-3">
 							<i class="bi bi-person-circle fs-1"></i>
 
-							<h5 class="mt-2" th:text="${user.fullName}">Nhất Nghệ Online</h5>
+							<h5 class="mt-2" th:text="${user.fullName}"></h5>
 
-							<h5 class="mt-2">Nhất Nghệ Online</h5>
+							
 
 						</div>
 						<nav class="nav flex-column">
@@ -64,6 +64,7 @@
 									<thead class="table-light">
 										<tr>
 											<th>Mã đơn</th>
+											<th>Email</th>
 											<th>Ngày đặt</th>
 											<th>Trạng thái</th>
 											<th>Địa chỉ giao</th>
@@ -74,6 +75,7 @@
 									<tbody>
 										<tr th:each="order : ${orders}">
 											<td th:text="${order.orderID}"></td>
+											<td th:text="${user.email}"></td>
 											<td th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}"></td>
 											<td th:text="${order.status}"></td>
 											<td th:text="${order.shippingAddress}"></td>

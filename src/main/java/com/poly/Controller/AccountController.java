@@ -63,15 +63,6 @@ public class AccountController {
 		List<Order> orders = orderRepository.findByUser_UserID(user.getUserID());
 		model.addAttribute("orders", orders);
 		model.addAttribute("user", user);
-
-	@GetMapping
-	public String index() {
-		return ("account/profile");
-	}
-
-	@GetMapping("/order-history")
-	public String orderHistory() {
-
-		return ("account/orderHistory");
+		return "account/orderHistory";
 	}
 }
