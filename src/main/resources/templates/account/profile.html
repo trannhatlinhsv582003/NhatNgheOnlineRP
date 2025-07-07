@@ -97,8 +97,18 @@
 	<!-- FOOTER -->
 	<div th:replace="components/_footer.html"></div>
 
+	<!-- Notification Modal (copy from _notificationModal.html) -->
+	<div th:replace="modals/_notificationModal.html"></div>
+
 	<script
 		th:src="@{/libraries/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js}"></script>
+
+	<script th:inline="javascript" th:if="${success}">
+	/*<![CDATA[*/
+	    showCustomMessage({ title: 'Thành công', message: 'Đã đổi thông tin thành công', type: 'success' });
+	/*]]>*/
+	</script>
+
 </body>
 
 <style>
