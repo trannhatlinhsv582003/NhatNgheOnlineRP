@@ -1,4 +1,4 @@
-﻿
+﻿-- Chuyển sang chế độ đơn người dùng để xóa DB nếu đang có kết nối
 USE master;
 ALTER DATABASE nhatNgheOnlineDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
 
@@ -172,6 +172,19 @@ INSERT INTO PaymentMethods (Code, Name, Description, IconURL) VALUES
 
 --THÊM DỮ LIỆU
 -- Bảng Người Dùng
+INSERT INTO Users (FullName, Email, PasswordHash, Address, Phone, Gender, BirthDay, Role, ImageURL)
+VALUES 
+(N'user', 'user@gmail.com', 
+ '$2a$10$QrH8eF0Id3Bbm4culTnPxeALKmbtqOzbfSz6Jn5dqt7rAmz9KKjx2',  -- user@gmail.com | 123
+ N'123 Đường A, Quận 1, TP.HCM', '0909123456', 1, '1995-05-10', 'Customer', NULL),
+
+(N'staff', 'staff@gmail.com', 
+ '$2a$10$QrH8eF0Id3Bbm4culTnPxeALKmbtqOzbfSz6Jn5dqt7rAmz9KKjx2',  -- staff@gmail.com | 123
+ N'456 Đường B, Quận 3, TP.HCM', '0911123456', 0, '1990-08-20', 'Staff', NULL),
+
+(N'admin', 'admin@gmail.com', 
+ '$2a$10$QrH8eF0Id3Bbm4culTnPxeALKmbtqOzbfSz6Jn5dqt7rAmz9KKjx2',  -- admin@gmail.com | 123
+ N'789 Đường C, Quận 5, TP.HCM', '0933123456', 1, '1985-03-15', 'Admin', NULL);
 
 
 -- Bảng Danh Mục

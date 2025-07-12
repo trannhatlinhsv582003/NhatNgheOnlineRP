@@ -157,19 +157,15 @@ public class CartController {
 		User currentUser = userDetails.getUser();
 		Order order;
 
-		// Trường hợp MUA NGAY
 		if (isBuyNow && buyNowOrderId != null) {
 			order = orderService.findById(buyNowOrderId)
 					.orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng mua ngay"));
 		} else {
-			// Trường hợp GIỎ HÀNG
 			List<Cart> cartItems = cartService.getCartItems(currentUser);
 			if (cartItems.isEmpty()) {
 				return "redirect:/cart";
 			}
-
 			order = orderService.createOrder(currentUser, userForm.getAddress(), cartItems);
-
 			for (Cart cart : cartItems) {
 				Product product = cart.getProduct();
 				OrderItem item = new OrderItem();
@@ -179,10 +175,22 @@ public class CartController {
 				item.setPrice(product.getPrice());
 				orderService.saveOrderItem(item);
 			}
-
-			// Xoá giỏ hàng
 			cartService.clearCart(currentUser);
 		}
+
+		// Luôn cập nhật thông tin giao hàng từ form vào đơn hàng
+		order.setShippingAddress(userForm.getAddress());
+		// Nếu có các trường receiverName, receiverPhone thì cập nhật tương tự:
+		// order.setReceiverName(userForm.getFullName());
+		// order.setReceiverPhone(userForm.getPhone());
+		// ...
+		// Cập nhật trạng thái đơn hàng
+		if ("cod".equals(paymentCode)) {
+			order.setStatus("Chờ xử lý");
+		} else {
+			order.setStatus("Chờ thanh toán");
+		}
+		orderService.save(order);
 
 		// Tạo bản ghi thanh toán
 		PaymentMethod method = paymentMethodService.findByCode(paymentCode);
