@@ -25,7 +25,7 @@ CREATE TABLE Users (
     Address NVARCHAR(255),
     Phone NVARCHAR(20),
     Gender BIT DEFAULT 1,
-    BirthDay DATE,
+    BirthDay DATE,  
     Role NVARCHAR(20) NOT NULL CHECK (Role IN ('Customer', 'Staff', 'Admin')),
     CreatedAt DATETIME DEFAULT GETDATE(),
     ImageURL NVARCHAR(255),
