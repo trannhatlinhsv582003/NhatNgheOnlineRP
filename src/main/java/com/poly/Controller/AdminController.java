@@ -23,10 +23,10 @@ public class AdminController {
 		return "admin/role/index";
 	}
 
-	@GetMapping("/product")
-	public String product() {
-		return "admin/product/index";
-	}
+	// @GetMapping("/product")
+	// public String product() {
+	// 	return "admin/product/index";
+	// }
 
 	@GetMapping("/category")
 	public String category() {
