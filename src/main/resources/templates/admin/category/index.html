@@ -35,7 +35,27 @@
 			<main class="col-md-10 ms-sm-auto px-4">
 				<div class="pt-4">
 					<h3 class="fw-bold mb-3">Chào mừng đến trang Quản lý danh mục!</h3>
-					
+					<a href="/admin/category/create" class="btn btn-success mb-3">Thêm mới danh mục</a>
+					<!-- Bảng danh mục -->
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Tên danh mục</th>
+								<th>Hành động</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="category, iterStat : ${categories}">
+								<td th:text="${iterStat.count}"></td>
+								<td th:text="${category.categoryName}"></td>
+								<td>
+									<a th:href="@{'/admin/category/edit/' + ${category.categoryID}}" class="btn btn-primary btn-sm">Sửa</a>
+									<a th:href="@{'/admin/category/delete/' + ${category.categoryID}}" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 			</main>
 		</div>
