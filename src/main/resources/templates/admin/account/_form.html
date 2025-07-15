@@ -1,10 +1,50 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Thêm/Sửa tài khoản</title>
+<link rel="stylesheet" th:href="@{/libraries/bootstrap-5.3.3-dist/css/bootstrap.min.css}">
 </head>
 <body>
-
+<div class="container mt-4">
+	<h3 th:text="${user.userID == null} ? 'Thêm tài khoản' : 'Sửa tài khoản'"></h3>
+	<form th:action="@{/admin/account/save}" th:object="${user}" method="post">
+		<input type="hidden" th:field="*{userID}" />
+		<div class="mb-3">
+			<label for="fullName" class="form-label">Họ tên</label>
+			<input type="text" class="form-control" id="fullName" th:field="*{fullName}" required />
+		</div>
+		<div class="mb-3">
+			<label for="email" class="form-label">Email</label>
+			<input type="email" class="form-control" id="email" th:field="*{email}" required />
+		</div>
+		<div class="mb-3">
+			<label for="phone" class="form-label">Điện thoại</label>
+			<input type="text" class="form-control" id="phone" th:field="*{phone}" />
+		</div>
+		<div class="mb-3">
+			<label class="form-label">Giới tính</label>
+			<select class="form-select" th:field="*{gender}">
+				<option th:value="true">Nam</option>
+				<option th:value="false">Nữ</option>
+			</select>
+		</div>
+		<div class="mb-3">
+			<label for="birthDay" class="form-label">Ngày sinh</label>
+			<input type="date" class="form-control" id="birthDay" th:field="*{birthDay}" />
+		</div>
+		<div class="mb-3">
+			<label for="role" class="form-label">Vai trò</label>
+			<input type="text" class="form-control" id="role" th:field="*{role}" required />
+		</div>
+		<div class="mb-3">
+			<label for="password" class="form-label">Mật khẩu</label>
+			<input type="password" class="form-control" id="password" name="password" />
+			<small th:if="${user.userID != null}">Để trống nếu không muốn đổi mật khẩu</small>
+		</div>
+		<button type="submit" class="btn btn-success">Lưu</button>
+		<a href="/admin/account" class="btn btn-secondary">Quay lại</a>
+	</form>
+</div>
 </body>
 </html>

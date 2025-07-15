@@ -35,6 +35,38 @@
 			<main class="col-md-10 ms-sm-auto px-4">
 				<div class="pt-4">
 					<h3 class="fw-bold mb-3">Chào mừng đến trang Quản lý tài khoản!</h3>
+					<a href="/admin/account/create" class="btn btn-success mb-3">Thêm mới tài khoản</a>
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>UserID</th>
+								<th>Họ tên</th>
+								<th>Email</th>
+								<th>Điện thoại</th>
+								<th>Giới tính</th>
+								<th>Ngày sinh</th>
+								<th>Vai trò</th>
+								<th>Hành động</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="user, iterStat : ${users}">
+								<td th:text="${iterStat.count}"></td>
+								<td th:text="${user.userID}"></td>
+								<td th:text="${user.fullName}"></td>
+								<td th:text="${user.email}"></td>
+								<td th:text="${user.phone}"></td>
+								<td th:text="${user.gender} ? 'Nam' : 'Nữ'"></td>
+								<td th:text="${user.birthDay}"></td>
+								<td th:text="${user.role}"></td>
+								<td>
+									<a th:href="@{'/admin/account/edit/' + ${user.userID}}" class="btn btn-primary btn-sm">Sửa</a>
+									<a th:href="@{'/admin/account/delete/' + ${user.userID}}" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 			</main>
 		</div>

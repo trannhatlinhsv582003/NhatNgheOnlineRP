@@ -64,7 +64,6 @@
 									<thead class="table-light">
 										<tr>
 											<th>Mã đơn</th>
-											<th>Email</th>
 											<th>Ngày đặt</th>
 											<th>Trạng thái</th>
 											<th>Địa chỉ giao</th>
@@ -75,7 +74,6 @@
 									<tbody>
 										<tr th:each="order : ${orders}">
 											<td th:text="${order.orderID}"></td>
-											<td th:text="${user.email}"></td>
 											<td th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}"></td>
 											<td th:text="${order.status}"></td>
 											<td th:text="${order.shippingAddress}"></td>
@@ -146,7 +144,7 @@
 
 <script>
 	function scrollToReview() {
-		// Kích hoạt tab "Đánh giá"
+		// Kích hoạt tab "Đánh gi1á"
 		const tabTrigger = document.querySelector('#review-tab');
 		const tab = new bootstrap.Tab(tabTrigger);
 		tab.show();

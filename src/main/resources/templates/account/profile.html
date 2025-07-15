@@ -61,7 +61,7 @@
 						<form th:action="@{/account}" th:object="${user}" method="post">
 							<div class="mb-3">
 								<label class="form-label">Họ Tên</label>
-								<input type="text" class="form-control" th:field="*{fullName}">
+								<input type="text" class="form-control" th:field="*{fullName}" required>
 							</div>
 							<div class="mb-3">
 								<label class="form-label d-block">Giới tính</label>
@@ -80,7 +80,7 @@
 							</div>
 							<div class="mb-3">
 								<label class="form-label">Email</label>
-								<input type="email" class="form-control" th:field="*{email}" disabled>
+								<input type="email" class="form-control" th:field="*{email}" readonly>
 							</div>
 							<div class="mb-4">
 								<label class="form-label">Ngày sinh</label>
@@ -97,18 +97,8 @@
 	<!-- FOOTER -->
 	<div th:replace="components/_footer.html"></div>
 
-	<!-- Notification Modal (copy from _notificationModal.html) -->
-	<div th:replace="modals/_notificationModal.html"></div>
-
 	<script
 		th:src="@{/libraries/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js}"></script>
-
-	<script th:inline="javascript" th:if="${success}">
-	/*<![CDATA[*/
-	    showCustomMessage({ title: 'Thành công', message: 'Đã đổi thông tin thành công', type: 'success' });
-	/*]]>*/
-	</script>
-
 </body>
 
 <style>
