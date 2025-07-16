@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,35 +23,38 @@ import lombok.Data;
 @Entity
 @Table(name = "Orders")
 public class Order {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer orderID;
 
-	@ManyToOne
-	@JoinColumn(name = "UserID", nullable = false)
-	private User user;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer orderID;
 
-	private LocalDateTime orderDate;
+    @ManyToOne
+    @JoinColumn(name = "UserID", nullable = false)
+    private User user;
 
-	@Column(nullable = false)
-	private String status;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "OrderDate")
+    private LocalDateTime orderDate;
 
-	private String trackingCode;
-	private String shippingAddress;
+    @Column(nullable = false)
+    private String status;
 
-	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-	private List<OrderItem> orderItems;
+    private String trackingCode;
+    private String shippingAddress;
 
-	@OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
-	private Payment payment;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderItem> orderItems;
 
-	public BigDecimal getTotalAmount() {
-		if (orderItems == null || orderItems.isEmpty()) {
-			return BigDecimal.ZERO;
-		}
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    private Payment payment;
 
-		return orderItems.stream().map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
-	}
+    public BigDecimal getTotalAmount() {
+        if (orderItems == null || orderItems.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        return orderItems.stream().map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 
 }
