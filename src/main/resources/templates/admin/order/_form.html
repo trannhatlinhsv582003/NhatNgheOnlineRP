@@ -1,10 +1,35 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
+<div class="mt-4" id="orderDetailSection" style="display: none;">
+    <h5>Thông tin đơn hàng</h5>
+    <p><strong>ID:</strong> <span id="orderID"></span></p>
+    <p><strong>Khách hàng:</strong> <span id="customerName"></span></p>
+    <p><strong>Ngày đặt:</strong> <span id="orderDate"></span></p>
+    <p><strong>Địa chỉ giao hàng:</strong> <span id="shippingAddress"></span></p>
 
-</body>
-</html>
+    <h6>Sản phẩm đã đặt</h6>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody id="orderItems">
+            <!-- Nội dung JS fill -->
+        </tbody>
+    </table>
+
+    <form method="post" action="/admin/order/update-status" onsubmit="return validateBeforeSubmit()">
+        <input type="hidden" name="orderID" id="orderIDField">
+        <div class="mb-3">
+            <label class="form-label">Trạng thái</label>
+            <select name="status" id="orderStatus" class="form-select w-auto d-inline-block">
+                <option>Chờ xử lý</option>
+                <option>Đã giao hàng</option>
+                <option>Hủy</option>
+            </select>
+            <button class="btn btn-success btn-sm" type="submit">Cập nhật</button>
+        </div>
+    </form>
+</div>
