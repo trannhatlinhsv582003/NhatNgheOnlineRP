@@ -33,125 +33,130 @@ import com.poly.Service.UserService;
 @RequestMapping("/product")
 public class ProductController {
 
-	@Autowired
-	private ProductRepository productRepository;
+    @Autowired
+    private ProductRepository productRepository;
 
-	@Autowired
-	private ProductService productService;
+    @Autowired
+    private ProductService productService;
 
-	@Autowired
-	private CategoryRepository categoryRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
-	@Autowired
-	private ReviewService reviewService;
+    @Autowired
+    private ReviewService reviewService;
 
-	@Autowired
-	private UserService userService;
+    @Autowired
+    private UserService userService;
 
-	@GetMapping("/detail/{id}")
-	public String showProductDetail(@PathVariable("id") Integer productId, Model model) {
-		Product product = productService.findById(productId)
-				.orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
+    @GetMapping("/detail/{id}")
+    public String showProductDetail(@PathVariable("id") Integer productId, Model model) {
+        Product product = productService.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
 
-		List<Product> relatedProducts = productRepository
-				.findTop4ByCategoryCategoryIDAndProductIDNot(product.getCategory().getCategoryID(), productId);
+        List<Product> relatedProducts = productRepository
+                .findTop4ByCategoryCategoryIDAndProductIDNot(product.getCategory().getCategoryID(), productId);
 
-		List<Review> reviews = reviewService.getApprovedReviewsByProduct(productId);
+        List<Review> reviews = reviewService.getApprovedReviewsByProduct(productId);
 
-		// Tính tổng đánh giá và điểm trung bình
-		int totalReviews = reviews.size();
-		double averageRating = 0.0;
-		if (totalReviews > 0) {
-			int totalScore = reviews.stream().mapToInt(Review::getRating).sum();
-			averageRating = (double) totalScore / totalReviews;
-		}
+        int totalReviews = reviews.size();
+        double averageRating = 0.0;
+        if (totalReviews > 0) {
+            int totalScore = reviews.stream().mapToInt(Review::getRating).sum();
+            averageRating = (double) totalScore / totalReviews;
+        }
 
-		// Format ngày cho từng review
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-		List<Map<String, Object>> formattedReviews = reviews.stream().map(r -> Map.of("user", r.getUser(), "rating",
-				r.getRating(), "comment", r.getComment(), "createdAt", r.getCreatedAt().format(formatter)))
-				.collect(Collectors.toList());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        List<Map<String, Object>> formattedReviews = reviews.stream().map(r -> Map.of(
+                "reviewID", r.getReviewID(), // cần thiết để xóa
+                "user", r.getUser(),
+                "rating", r.getRating(),
+                "comment", r.getComment(),
+                "createdAt", r.getCreatedAt().format(formatter)
+        )).collect(Collectors.toList());
 
-		// Gửi dữ liệu sang view
-		model.addAttribute("product", product);
-		model.addAttribute("relatedProducts", relatedProducts);
-		model.addAttribute("reviews", formattedReviews);
-		model.addAttribute("averageRating", averageRating);
-		model.addAttribute("totalReviews", totalReviews);
+        // Gán isAdmin nếu currentUser tồn tại và là ADMIN
+        User currentUser = (User) model.getAttribute("currentUser");
+        model.addAttribute("isAdmin", currentUser != null && "Admin".equals(currentUser.getRole()));
 
-		return "product/detail";
-	}
+        model.addAttribute("product", product);
+        model.addAttribute("relatedProducts", relatedProducts);
+        model.addAttribute("reviews", formattedReviews);
+        model.addAttribute("averageRating", averageRating);
+        model.addAttribute("totalReviews", totalReviews);
 
-	@PostMapping("/review")
-	@ResponseBody
-	public ResponseEntity<?> postReview(@RequestParam Integer productId, @RequestParam int rating,
-			@RequestParam String comment, Principal principal) {
+        return "product/detail";
+    }
 
-		if (principal == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("unauthorized");
-		}
+    @PostMapping("/review")
+    @ResponseBody
+    public ResponseEntity<?> postReview(@RequestParam Integer productId, @RequestParam int rating,
+            @RequestParam String comment, Principal principal) {
 
-		// Lấy user từ email
-		User currentUser = userService.findByEmail(principal.getName());
-		if (currentUser == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("unauthorized");
-		}
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("unauthorized");
+        }
 
-		Product product = productService.findById(productId)
-				.orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
+        // Lấy user từ email
+        User currentUser = userService.findByEmail(principal.getName());
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("unauthorized");
+        }
 
-		Review review = new Review();
-		review.setProduct(product);
-		review.setUser(currentUser);
-		review.setRating(rating);
-		review.setComment(comment);
-		review.setApproved(true); // không cần duyệt
-		review.setCreatedAt(LocalDateTime.now());
+        Product product = productService.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
 
-		reviewService.save(review);
-		return ResponseEntity.ok("success");
-	}
+        Review review = new Review();
+        review.setProduct(product);
+        review.setUser(currentUser);
+        review.setRating(rating);
+        review.setComment(comment);
+        review.setApproved(true); // không cần duyệt
+        review.setCreatedAt(LocalDateTime.now());
 
-	@GetMapping("/category/{id}")
-	public String category(@PathVariable("id") Integer categoryId,
-			@RequestParam(value = "brand", required = false) String brand,
-			@RequestParam(value = "sort", required = false) String sort, Model model) {
+        reviewService.save(review);
+        return ResponseEntity.ok("success");
+    }
 
-		List<Product> products;
+    @GetMapping("/category/{id}")
+    public String category(@PathVariable("id") Integer categoryId,
+            @RequestParam(value = "brand", required = false) String brand,
+            @RequestParam(value = "sort", required = false) String sort, Model model) {
 
-		if (brand != null && !brand.isEmpty()) {
-			if ("asc".equals(sort)) {
-				products = productRepository.findByCategoryCategoryIDAndBrandNameOrderByPriceAsc(categoryId, brand);
-			} else if ("desc".equals(sort)) {
-				products = productRepository.findByCategoryCategoryIDAndBrandNameOrderByPriceDesc(categoryId, brand);
-			} else {
-				products = productRepository.findByCategoryCategoryIDAndBrandName(categoryId, brand);
-			}
-		} else {
-			if ("asc".equals(sort)) {
-				products = productRepository.findByCategoryCategoryIDOrderByPriceAsc(categoryId);
-			} else if ("desc".equals(sort)) {
-				products = productRepository.findByCategoryCategoryIDOrderByPriceDesc(categoryId);
-			} else {
-				products = productRepository.findByCategoryCategoryID(categoryId);
-			}
-		}
+        List<Product> products;
 
-		// Tên danh mục
-		String categoryName = categoryRepository.findById(categoryId).map(Category::getCategoryName)
-				.orElse("Danh mục không tồn tại");
+        if (brand != null && !brand.isEmpty()) {
+            if ("asc".equals(sort)) {
+                products = productRepository.findByCategoryCategoryIDAndBrandNameOrderByPriceAsc(categoryId, brand);
+            } else if ("desc".equals(sort)) {
+                products = productRepository.findByCategoryCategoryIDAndBrandNameOrderByPriceDesc(categoryId, brand);
+            } else {
+                products = productRepository.findByCategoryCategoryIDAndBrandName(categoryId, brand);
+            }
+        } else {
+            if ("asc".equals(sort)) {
+                products = productRepository.findByCategoryCategoryIDOrderByPriceAsc(categoryId);
+            } else if ("desc".equals(sort)) {
+                products = productRepository.findByCategoryCategoryIDOrderByPriceDesc(categoryId);
+            } else {
+                products = productRepository.findByCategoryCategoryID(categoryId);
+            }
+        }
 
-		// Gửi danh sách brand để render filter
-		List<String> brands = productRepository.findDistinctBrandNamesByCategoryId(categoryId);
+        // Tên danh mục
+        String categoryName = categoryRepository.findById(categoryId).map(Category::getCategoryName)
+                .orElse("Danh mục không tồn tại");
 
-		model.addAttribute("products", products);
-		model.addAttribute("categoryId", categoryId);
-		model.addAttribute("categoryName", categoryName);
-		model.addAttribute("selectedBrand", brand);
-		model.addAttribute("selectedSort", sort);
-		model.addAttribute("brands", brands);
+        // Gửi danh sách brand để render filter
+        List<String> brands = productRepository.findDistinctBrandNamesByCategoryId(categoryId);
 
-		return "product/category";
-	}
+        model.addAttribute("products", products);
+        model.addAttribute("categoryId", categoryId);
+        model.addAttribute("categoryName", categoryName);
+        model.addAttribute("selectedBrand", brand);
+        model.addAttribute("selectedSort", sort);
+        model.addAttribute("brands", brands);
+
+        return "product/category";
+    }
 
 }
