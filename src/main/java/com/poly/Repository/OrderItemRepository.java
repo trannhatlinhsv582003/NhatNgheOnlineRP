@@ -15,4 +15,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
     @Query("SELECT SUM(oi.quantity) FROM OrderItem oi JOIN oi.order o WHERE o.status = 'Delivered'")
     Integer getTotalSoldQuantity();
 
+    @Query("SELECT SUM(oi.quantity) FROM OrderItem oi JOIN oi.order o WHERE o.status = 'Cancelled'")
+    Integer getTotalCancelledQuantity();
+
 }

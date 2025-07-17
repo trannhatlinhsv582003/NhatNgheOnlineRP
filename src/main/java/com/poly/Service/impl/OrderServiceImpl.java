@@ -97,4 +97,10 @@ public class OrderServiceImpl implements OrderService {
         Integer total = orderItemRepository.getTotalSoldQuantity();
         return total != null ? total : 0;
     }
+
+    @Override
+    public int getTotalCancelledProducts() {
+        Integer total = orderItemRepository.getTotalCancelledQuantity();
+        return total != null ? total : 0;
+    }
 }

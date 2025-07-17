@@ -27,16 +27,13 @@ public class AdminOverview {
     public String index(Model model) {
         var revenue = orderService.getTotalRevenue();
         var totalSold = orderService.getTotalSoldProducts();
+        var totalCancelled = orderService.getTotalCancelledProducts();
         var topProducts = productService.getTopSellingProducts(10);
         var reviews = reviewService.getRecentReviews(5);
 
-        System.out.println("🧾 Doanh thu: " + revenue);
-        System.out.println("📦 Đã bán: " + totalSold);
-        System.out.println("🔥 Top sản phẩm: " + topProducts.size());
-        System.out.println("⭐ Review gần đây: " + reviews.size());
-
         model.addAttribute("totalRevenue", revenue);
         model.addAttribute("totalSoldProducts", totalSold);
+        model.addAttribute("totalCancelledProducts", totalCancelled);
         model.addAttribute("topSellingProducts", topProducts);
         model.addAttribute("recentReviews", reviews);
 
