@@ -1,6 +1,7 @@
 // OrderService.java
 package com.poly.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,4 +30,8 @@ public interface OrderService {
     Page<Order> findAll(Pageable pageable);
 
     Page<Order> searchOrders(String keyword, Pageable pageable);
+
+    BigDecimal getTotalRevenue();
+
+    int getTotalSoldProducts();
 }

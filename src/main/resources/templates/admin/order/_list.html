@@ -23,10 +23,11 @@
                 </td>
                 <td>
                     <span th:switch="${order.status}">
-                        <span th:case="'Chờ xử lý'" class="badge bg-warning text-dark">Chờ xử lý</span>
-                        <span th:case="'Chờ thanh toán'" class="badge bg-primary">Đã thanh toán</span>
-                        <span th:case="'Đã giao hàng'" class="badge bg-success">Đã giao hàng</span>
-                        <span th:case="'Hủy'" class="badge bg-danger">Đã hủy</span>
+                        <span th:case="'Pending'" class="badge bg-warning text-dark">Pending</span>
+                        <span th:case="'Pending'" class="badge bg-primary">Paid</span>
+                        <span th:case="'Delivered'" class="badge bg-success">Delivered</span>
+                        <span th:case="'Shipping'" class="badge bg-info">Shipping</span>
+                        <span th:case="'Cancelled'" class="badge bg-secondary">Cancelled</span>
                         <span th:case="*" class="badge bg-secondary" th:text="${order.status}">Khác</span>
                     </span>
 

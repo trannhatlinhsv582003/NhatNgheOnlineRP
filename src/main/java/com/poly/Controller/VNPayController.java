@@ -34,102 +34,102 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequestMapping("/vnpay")
 public class VNPayController {
 
-	@Autowired
-	private OrderService orderService;
+    @Autowired
+    private OrderService orderService;
 
-	@Autowired
-	private PaymentService paymentService;
+    @Autowired
+    private PaymentService paymentService;
 
-	@Value("${vnpay.tmnCode}")
-	private String vnp_TmnCode;
+    @Value("${vnpay.tmnCode}")
+    private String vnp_TmnCode;
 
-	@Value("${vnpay.hashSecret}")
-	private String vnp_HashSecret;
+    @Value("${vnpay.hashSecret}")
+    private String vnp_HashSecret;
 
-	@Value("${vnpay.payUrl}")
-	private String vnp_PayUrl;
+    @Value("${vnpay.payUrl}")
+    private String vnp_PayUrl;
 
-	@Value("${vnpay.returnUrl}")
-	private String vnp_ReturnUrl;
+    @Value("${vnpay.returnUrl}")
+    private String vnp_ReturnUrl;
 
-	@GetMapping("/checkout")
-	public void checkout(@RequestParam("orderId") Integer orderId, HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
-		Order order = orderService.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+    @GetMapping("/checkout")
+    public void checkout(@RequestParam("orderId") Integer orderId, HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+        Order order = orderService.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
 
-		long amount = order.getTotalAmount().multiply(BigDecimal.valueOf(100)).longValue(); // BigDecimal → VND
+        long amount = order.getTotalAmount().multiply(BigDecimal.valueOf(100)).longValue(); // BigDecimal → VND
 
-		String vnp_TxnRef = String.valueOf(orderId);
-		String vnp_IpAddr = request.getHeader("X-FORWARDED-FOR");
-		if (vnp_IpAddr == null) {
-			vnp_IpAddr = request.getRemoteAddr();
-		}
+        String vnp_TxnRef = String.valueOf(orderId);
+        String vnp_IpAddr = request.getHeader("X-FORWARDED-FOR");
+        if (vnp_IpAddr == null) {
+            vnp_IpAddr = request.getRemoteAddr();
+        }
 
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-		Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
-		String vnp_CreateDate = formatter.format(cld.getTime());
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        String vnp_CreateDate = formatter.format(cld.getTime());
 
-		cld.add(Calendar.MINUTE, 15);
-		String vnp_ExpireDate = formatter.format(cld.getTime());
+        cld.add(Calendar.MINUTE, 15);
+        String vnp_ExpireDate = formatter.format(cld.getTime());
 
-		Map<String, String> vnpParams = new HashMap<>();
-		vnpParams.put("vnp_Version", "2.1.0");
-		vnpParams.put("vnp_Command", "pay");
-		vnpParams.put("vnp_TmnCode", vnp_TmnCode);
-		vnpParams.put("vnp_Amount", String.valueOf(amount));
-		vnpParams.put("vnp_CurrCode", "VND");
-		vnpParams.put("vnp_TxnRef", vnp_TxnRef);
-		vnpParams.put("vnp_OrderInfo", "Thanh toan don hang " + vnp_TxnRef);
-		vnpParams.put("vnp_OrderType", "other");
-		vnpParams.put("vnp_Locale", "vn");
-		vnpParams.put("vnp_ReturnUrl", vnp_ReturnUrl);
-		vnpParams.put("vnp_IpAddr", vnp_IpAddr);
-		vnpParams.put("vnp_CreateDate", vnp_CreateDate);
-		vnpParams.put("vnp_ExpireDate", vnp_ExpireDate);
-		vnpParams.put("vnp_BankCode", "NCB");
+        Map<String, String> vnpParams = new HashMap<>();
+        vnpParams.put("vnp_Version", "2.1.0");
+        vnpParams.put("vnp_Command", "pay");
+        vnpParams.put("vnp_TmnCode", vnp_TmnCode);
+        vnpParams.put("vnp_Amount", String.valueOf(amount));
+        vnpParams.put("vnp_CurrCode", "VND");
+        vnpParams.put("vnp_TxnRef", vnp_TxnRef);
+        vnpParams.put("vnp_OrderInfo", "Thanh toan don hang " + vnp_TxnRef);
+        vnpParams.put("vnp_OrderType", "other");
+        vnpParams.put("vnp_Locale", "vn");
+        vnpParams.put("vnp_ReturnUrl", vnp_ReturnUrl);
+        vnpParams.put("vnp_IpAddr", vnp_IpAddr);
+        vnpParams.put("vnp_CreateDate", vnp_CreateDate);
+        vnpParams.put("vnp_ExpireDate", vnp_ExpireDate);
+        vnpParams.put("vnp_BankCode", "NCB");
 
-		// Build signed URL
-		List<String> fieldNames = new ArrayList<>(vnpParams.keySet());
-		Collections.sort(fieldNames);
-		StringBuilder hashData = new StringBuilder();
-		StringBuilder query = new StringBuilder();
+        // Build signed URL
+        List<String> fieldNames = new ArrayList<>(vnpParams.keySet());
+        Collections.sort(fieldNames);
+        StringBuilder hashData = new StringBuilder();
+        StringBuilder query = new StringBuilder();
 
-		for (int i = 0; i < fieldNames.size(); i++) {
-			String key = fieldNames.get(i);
-			String value = vnpParams.get(key);
-			hashData.append(key).append("=").append(URLEncoder.encode(value, StandardCharsets.US_ASCII));
-			query.append(URLEncoder.encode(key, StandardCharsets.US_ASCII)).append("=")
-					.append(URLEncoder.encode(value, StandardCharsets.US_ASCII));
-			if (i < fieldNames.size() - 1) {
-				hashData.append("&");
-				query.append("&");
-			}
-		}
+        for (int i = 0; i < fieldNames.size(); i++) {
+            String key = fieldNames.get(i);
+            String value = vnpParams.get(key);
+            hashData.append(key).append("=").append(URLEncoder.encode(value, StandardCharsets.US_ASCII));
+            query.append(URLEncoder.encode(key, StandardCharsets.US_ASCII)).append("=")
+                    .append(URLEncoder.encode(value, StandardCharsets.US_ASCII));
+            if (i < fieldNames.size() - 1) {
+                hashData.append("&");
+                query.append("&");
+            }
+        }
 
-		String secureHash = VNPayUtil.hmacSHA512(vnp_HashSecret, hashData.toString());
-		query.append("&vnp_SecureHash=").append(secureHash);
+        String secureHash = VNPayUtil.hmacSHA512(vnp_HashSecret, hashData.toString());
+        query.append("&vnp_SecureHash=").append(secureHash);
 
-		String paymentUrl = vnp_PayUrl + "?" + query.toString();
-		System.out.println("Redirect URL: " + paymentUrl);
-		response.sendRedirect(paymentUrl);
-	}
+        String paymentUrl = vnp_PayUrl + "?" + query.toString();
+        System.out.println("Redirect URL: " + paymentUrl);
+        response.sendRedirect(paymentUrl);
+    }
 
-	// Sau khi thanh toán xong.
-	@GetMapping("/return")
-	public String vnpReturn(@RequestParam Map<String, String> allParams, Model model) {
-		String responseCode = allParams.get("vnp_ResponseCode");
-		String txnRef = allParams.get("vnp_TxnRef");
+    // Sau khi thanh toán xong.
+    @GetMapping("/return")
+    public String vnpReturn(@RequestParam Map<String, String> allParams, Model model) {
+        String responseCode = allParams.get("vnp_ResponseCode");
+        String txnRef = allParams.get("vnp_TxnRef");
 
-		Order order = orderService.findById(Integer.parseInt(txnRef))
-				.orElseThrow(() -> new RuntimeException("Order not found"));
-		Payment payment = paymentService.findByOrder(order);
+        Order order = orderService.findById(Integer.parseInt(txnRef))
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        Payment payment = paymentService.findByOrder(order);
 
-		if ("00".equals(responseCode)) {
-			payment.setPaymentStatus("Đã thanh toán");
-			paymentService.save(payment);
-		}
+        if ("00".equals(responseCode)) {
+            payment.setPaymentStatus("Paid");
+            paymentService.save(payment);
+        }
 
-		return "redirect:/cart/result?orderId=" + txnRef;
-	}
+        return "redirect:/cart/result?orderId=" + txnRef;
+    }
 
 }

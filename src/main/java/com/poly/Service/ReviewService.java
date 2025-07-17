@@ -8,15 +8,18 @@ import com.poly.Model.Review;
 import com.poly.Model.User;
 
 public interface ReviewService {
-	List<Review> findAll();
 
-	List<Review> getApprovedReviewsByProduct(Integer productId);
+    List<Review> findAll();
 
-	Optional<Review> findById(Integer id);
+    List<Review> getApprovedReviewsByProduct(Integer productId);
 
-	User findByEmail(String email);
+    Optional<Review> findById(Integer id);
 
-	Review save(Review review);
+    User findByEmail(String email);
 
-	void deleteById(Integer id);
+    Review save(Review review);
+
+    void deleteById(Integer id);
+
+    List<Review> getRecentReviews(int limit);
 }

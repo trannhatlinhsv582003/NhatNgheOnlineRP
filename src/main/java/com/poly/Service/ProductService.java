@@ -6,16 +6,20 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.poly.DTO.TopProductDTO;
 import com.poly.Model.Product;
 
 public interface ProductService {
-	List<Product> findAll();
 
-	Optional<Product> findById(Integer id);
+    List<Product> findAll();
 
-	Product save(Product product);
+    Optional<Product> findById(Integer id);
 
-	void deleteById(Integer id);
-	
-	Page<Product> findAll(Pageable pageable);
+    Product save(Product product);
+
+    void deleteById(Integer id);
+
+    Page<Product> findAll(Pageable pageable);
+
+    List<TopProductDTO> getTopSellingProducts(int limit);
 }

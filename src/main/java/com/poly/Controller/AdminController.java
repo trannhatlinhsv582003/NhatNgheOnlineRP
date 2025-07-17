@@ -28,11 +28,6 @@ public class AdminController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @GetMapping
-    public String index() {
-        return "admin/index";
-    }
-
     @GetMapping("/account")
     public String account(Model model) {
         model.addAttribute("users", userService.findAll());

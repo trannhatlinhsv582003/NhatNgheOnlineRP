@@ -1,6 +1,7 @@
 // OrderServiceImpl.java
 package com.poly.Service.impl;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -55,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order();
         order.setUser(user);
         order.setOrderDate(LocalDateTime.now());
-        order.setStatus("Chờ xử lý");
+        order.setStatus("Pending");
         order.setShippingAddress(shippingAddress);
         return orderRepository.save(order);
     }
@@ -83,5 +84,17 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Page<Order> findAll(Pageable pageable) {
         return orderRepository.findAll(pageable);
+    }
+
+    @Override
+    public BigDecimal getTotalRevenue() {
+        BigDecimal revenue = orderRepository.getTotalRevenue();
+        return revenue != null ? revenue : BigDecimal.ZERO;
+    }
+
+    @Override
+    public int getTotalSoldProducts() {
+        Integer total = orderItemRepository.getTotalSoldQuantity();
+        return total != null ? total : 0;
     }
 }
