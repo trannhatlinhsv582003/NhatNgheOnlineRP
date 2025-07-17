@@ -1,10 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Thêm/Sửa danh mục</title>
+<link rel="stylesheet" th:href="@{/libraries/bootstrap-5.3.3-dist/css/bootstrap.min.css}">
 </head>
 <body>
-
+<div class="container mt-4">
+	<h3 th:text="${category.categoryID == null} ? 'Thêm danh mục' : 'Sửa danh mục'"></h3>
+	<form th:action="@{/admin/category/save}" th:object="${category}" method="post">
+		<input type="hidden" th:field="*{categoryID}" />
+		<div class="mb-3">
+			<label for="categoryName" class="form-label">Tên danh mục</label>
+			<input type="text" class="form-control" id="categoryName" th:field="*{categoryName}" required />
+		</div>
+		<button type="submit" class="btn btn-success">Lưu</button>
+		<a href="/admin/category" class="btn btn-secondary">Quay lại</a>
+	</form>
+</div>
 </body>
 </html>

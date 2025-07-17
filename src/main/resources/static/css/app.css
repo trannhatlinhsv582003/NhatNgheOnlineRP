@@ -47,3 +47,7 @@ a.requires-login::after {
     50%  { filter: brightness(150%); }
     100% { filter: brightness(100%); }
 }
+
+.review-item:hover .delete-review-btn {
+    display: inline-block !important;
+}

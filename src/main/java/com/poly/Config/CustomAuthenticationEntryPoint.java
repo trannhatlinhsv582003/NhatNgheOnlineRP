@@ -18,6 +18,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 		// Khi chưa đăng nhập, trả về lỗi 401 (không redirect nữa)
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		response.setContentType("application/json");
-		response.getWriter().write("{\"message\":\"Bạn cần đăng nhập để tiếp tục\"}");
+		response.sendRedirect("/");
 	}
 }

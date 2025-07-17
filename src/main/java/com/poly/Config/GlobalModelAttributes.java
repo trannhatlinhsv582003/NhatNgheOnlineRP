@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import com.poly.Model.User;
 import com.poly.Security.CustomUserDetails;
 import com.poly.Service.CartService;
+import com.poly.Service.CategoryService;
 
 //tạo các biến global để dùng ở mọi file
 
@@ -18,6 +19,9 @@ public class GlobalModelAttributes {
 
 	@Autowired
 	private CartService cartService;
+
+	@Autowired
+	private CategoryService categoryService;
 
 	// truyền current user đến mọi model
 	@ModelAttribute
@@ -49,5 +53,11 @@ public class GlobalModelAttributes {
 		} else {
 			model.addAttribute("cartItemCount", 0); // chưa login
 		}
+	}
+
+	// truyền danh sách category cho mọi view
+	@ModelAttribute("categories")
+	public void addCategories(Model model) {
+		model.addAttribute("categories", categoryService.findAll());
 	}
 }

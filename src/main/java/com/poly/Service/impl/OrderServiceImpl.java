@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.poly.Model.Cart;
@@ -22,50 +24,64 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class OrderServiceImpl implements OrderService {
-	@Autowired
-	private OrderRepository orderRepository;
-	@Autowired
-	private OrderItemRepository orderItemRepository;
 
-	@Autowired
-	private ProductRepository productRepository;
+    @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
+    private OrderItemRepository orderItemRepository;
 
-	public List<Order> findAll() {
-		return orderRepository.findAll();
-	}
+    @Autowired
+    private ProductRepository productRepository;
 
-	public Optional<Order> findById(Integer id) {
-		return orderRepository.findById(id);
-	}
+    public List<Order> findAll() {
+        return orderRepository.findAll();
+    }
 
-	public Order save(Order order) {
-		return orderRepository.save(order);
-	}
+    public Optional<Order> findById(Integer id) {
+        return orderRepository.findById(id);
+    }
 
-	public void deleteById(Integer id) {
-		orderRepository.deleteById(id);
-	}
+    public Order save(Order order) {
+        return orderRepository.save(order);
+    }
 
-	@Override
-	@Transactional
-	public Order createOrder(User user, String shippingAddress, List<Cart> cartItems) {
-		Order order = new Order();
-		order.setUser(user);
-		order.setOrderDate(LocalDateTime.now());
-		order.setStatus("Chờ xử lý");
-		order.setShippingAddress(shippingAddress);
-		return orderRepository.save(order);
-	}
+    public void deleteById(Integer id) {
+        orderRepository.deleteById(id);
+    }
 
-	@Override
-	public void saveOrderItem(OrderItem item) {
-		// Giảm số lượng tồn kho
-		Product product = item.getProduct();
-		int currentStock = product.getStockQuantity();
-		product.setStockQuantity(currentStock - item.getQuantity());
-		productRepository.save(product);
+    @Override
+    @Transactional
+    public Order createOrder(User user, String shippingAddress, List<Cart> cartItems) {
+        Order order = new Order();
+        order.setUser(user);
+        order.setOrderDate(LocalDateTime.now());
+        order.setStatus("Chờ xử lý");
+        order.setShippingAddress(shippingAddress);
+        return orderRepository.save(order);
+    }
 
-		// Lưu OrderItem
-		orderItemRepository.save(item);
-	}
+    @Override
+    public void saveOrderItem(OrderItem item) {
+        // Giảm số lượng tồn kho
+        Product product = item.getProduct();
+        int currentStock = product.getStockQuantity();
+        product.setStockQuantity(currentStock - item.getQuantity());
+        productRepository.save(product);
+
+        // Lưu OrderItem
+        orderItemRepository.save(item);
+    }
+
+    @Override
+    public Page<Order> searchOrders(String keyword, Pageable pageable) {
+        if (keyword == null || keyword.isBlank()) {
+            return orderRepository.findAll(pageable);
+        }
+        return orderRepository.findByUserFullNameContainingIgnoreCase(keyword, pageable);
+    }
+
+    @Override
+    public Page<Order> findAll(Pageable pageable) {
+        return orderRepository.findAll(pageable);
+    }
 }

@@ -21,59 +21,59 @@ import com.poly.Repository.UserRepository;
 @RequestMapping("/account")
 public class AccountController {
 
-	@Autowired
-	private UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-	@Autowired
-	private OrderRepository orderRepository;
+    @Autowired
+    private OrderRepository orderRepository;
 
-	@GetMapping
-	public String index(Model model) {
-		// Lấy email user hiện tại từ security context
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		String email = auth.getName();
-		User user = userRepository.findByEmail(email);
-		model.addAttribute("user", user);
-		return "account/profile";
-	}
+    @GetMapping
+    public String index(Model model) {
+        // Lấy email user hiện tại từ security context
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        User user = userRepository.findByEmail(email);
+        model.addAttribute("user", user);
+        return "account/profile";
+    }
 
-	@PostMapping
-	public String updateProfile(@ModelAttribute("user") User formUser, Model model) {
-		// Lấy user hiện tại từ DB
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		String email = auth.getName();
-		User user = userRepository.findByEmail(email);
-		if (user != null) {
-			user.setFullName(formUser.getFullName());
-			user.setGender(formUser.getGender());
-			user.setPhone(formUser.getPhone());
-			user.setBirthDay(formUser.getBirthDay());
-			userRepository.save(user);
-			model.addAttribute("user", user);
-			model.addAttribute("success", true);
-		}
-		return "account/profile";
-	}
+    @PostMapping
+    public String updateProfile(@ModelAttribute("user") User formUser, Model model) {
+        // Lấy user hiện tại từ DB
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        User user = userRepository.findByEmail(email);
+        if (user != null) {
+            user.setFullName(formUser.getFullName());
+            user.setGender(formUser.getGender());
+            user.setPhone(formUser.getPhone());
+            user.setBirthDay(formUser.getBirthDay());
+            userRepository.save(user);
+            model.addAttribute("user", user);
+            model.addAttribute("success", true);
+        }
+        return "account/profile";
+    }
 
-	@GetMapping("/order-history")
-	public String orderHistory(Model model) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		String email = auth.getName();
-		User user = userRepository.findByEmail(email);
-		List<Order> orders = orderRepository.findByUser_UserID(user.getUserID());
-		model.addAttribute("orders", orders);
-		model.addAttribute("user", user);
-		return ("account/orderHistory");
-	}
+    @GetMapping("/order-history")
+    public String orderHistory(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        User user = userRepository.findByEmail(email);
+        List<Order> orders = orderRepository.findByUser_UserID(user.getUserID());
+        model.addAttribute("orders", orders);
+        model.addAttribute("user", user);
+        return "account/orderHistory";
+    }
 
-	// @GetMapping
-	// public String index() {
-	// return ("account/profile");
-	// }
-	//
-	// @GetMapping("/order-history")
-	// public String orderHistory() {
-	//
-	// return ("account/orderHistory");
-	// }
+    // @GetMapping
+    // public String index() {
+    // return ("account/profile");
+    // }
+    //
+    // @GetMapping("/order-history")
+    // public String orderHistory() {
+    //
+    // return ("account/orderHistory");
+    // }
 }
