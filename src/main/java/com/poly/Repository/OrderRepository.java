@@ -21,7 +21,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     SELECT SUM(oi.quantity * oi.price)
     FROM OrderItem oi
     JOIN oi.order o
-    WHERE o.status = 'Delivered'
+    WHERE o.status IN ('Delivered', 'Paid')
 """)
     BigDecimal getTotalRevenue();
 

@@ -154,6 +154,7 @@ public class CartController {
             @RequestParam(name = "buyNowOrderId", required = false) Integer buyNowOrderId,
             @RequestParam(name = "isBuyNow", defaultValue = "false") boolean isBuyNow,
             RedirectAttributes redirectAttributes) {
+
         User currentUser = userDetails.getUser();
         Order order;
 
@@ -178,38 +179,39 @@ public class CartController {
             cartService.clearCart(currentUser);
         }
 
-        // Luôn cập nhật thông tin giao hàng từ form vào đơn hàng
         order.setShippingAddress(userForm.getAddress());
-        // Nếu có các trường receiverName, receiverPhone thì cập nhật tương tự:
-        // order.setReceiverName(userForm.getFullName());
-        // order.setReceiverPhone(userForm.getPhone());
-        // ...
-        // Cập nhật trạng thái đơn hàng
-        if ("cod".equals(paymentCode)) {
+
+        if ("cod".equalsIgnoreCase(paymentCode)) {
             order.setStatus("Pending");
+        } else if ("vnpay".equalsIgnoreCase(paymentCode) || "qrpay".equalsIgnoreCase(paymentCode)) {
+            order.setStatus("Paid");
         } else {
-            order.setStatus("Pending");
+            order.setStatus("Not Confirm");
         }
         orderService.save(order);
 
-        // Tạo bản ghi thanh toán
-        PaymentMethod method = paymentMethodService.findByCode(paymentCode);
-        Payment payment = new Payment();
-        payment.setOrder(order);
-        payment.setPaymentMethod(method);
-        payment.setPaymentDate(LocalDateTime.now());
-        payment.setPaymentStatus("Chưa thanh toán");
-        payment.setPaymentNote(note);
-        paymentService.save(payment);
-
-        // Điều hướng theo phương thức thanh toán
-        if ("cod".equals(paymentCode)) {
-            payment.setPaymentStatus("Paid");
+        Payment existingPayment = paymentService.findByOrder(order);
+        if (existingPayment == null) {
+            PaymentMethod method = paymentMethodService.findByCode(paymentCode);
+            Payment payment = new Payment();
+            payment.setOrder(order);
+            payment.setPaymentMethod(method);
+            payment.setPaymentDate(LocalDateTime.now());
+            payment.setPaymentStatus("Pending");
+            payment.setPaymentNote(note);
             paymentService.save(payment);
+
+            if ("cod".equalsIgnoreCase(paymentCode)) {
+                payment.setPaymentStatus("Paid");
+                paymentService.save(payment);
+            }
+        }
+
+        if ("cod".equalsIgnoreCase(paymentCode)) {
             return "redirect:/cart/result?orderId=" + order.getOrderID();
-        } else if ("vnpay".equals(paymentCode)) {
+        } else if ("vnpay".equalsIgnoreCase(paymentCode)) {
             return "redirect:/vnpay/checkout?orderId=" + order.getOrderID();
-        } else if ("qrpay".equals(paymentCode)) {
+        } else if ("qrpay".equalsIgnoreCase(paymentCode)) {
             return "redirect:/qr/checkout?orderId=" + order.getOrderID();
         }
 
@@ -223,13 +225,12 @@ public class CartController {
         Order order = orderService.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
         Payment payment = paymentService.findByOrder(order);
 
-        // Format ngày tại đây
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         String formattedDate = order.getOrderDate().format(formatter);
 
         model.addAttribute("order", order);
         model.addAttribute("payment", payment);
-        model.addAttribute("formattedDate", formattedDate); // thêm dòng này
+        model.addAttribute("formattedDate", formattedDate);
         return "cart/result";
     }
 
@@ -245,7 +246,6 @@ public class CartController {
 
         User user = userDetails.getUser();
 
-        // Tạo đơn hàng tạm thời
         Order tempOrder = new Order();
         tempOrder.setUser(user);
         tempOrder.setOrderDate(LocalDateTime.now());
@@ -253,7 +253,6 @@ public class CartController {
         tempOrder.setShippingAddress(user.getAddress());
         orderService.save(tempOrder);
 
-        // Thêm sản phẩm vào đơn hàng
         OrderItem item = new OrderItem();
         item.setOrder(tempOrder);
         item.setProduct(product);
@@ -261,14 +260,11 @@ public class CartController {
         item.setPrice(product.getPrice());
         orderService.saveOrderItem(item);
 
-        // Truyền user và thông tin mua ngay sang bước info
         redirectAttributes.addFlashAttribute("user", user);
 
         return "redirect:/cart/info?isBuyNow=true&buyNowOrderId=" + tempOrder.getOrderID();
-
     }
 
-    // Các API khác
     @PostMapping("/update")
     public String updateQuantity(@RequestParam("productId") Integer productId,
             @RequestParam("quantity") Integer quantity, @AuthenticationPrincipal CustomUserDetails userDetails) {
