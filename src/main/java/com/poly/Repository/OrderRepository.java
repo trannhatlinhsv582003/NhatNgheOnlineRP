@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.poly.Model.Order;
+import com.poly.Model.User;
 
 public interface OrderRepository extends JpaRepository<Order, Integer> {
 
@@ -25,4 +26,5 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 """)
     BigDecimal getTotalRevenue();
 
+    List<Order> findByShipper(User shipper);
 }

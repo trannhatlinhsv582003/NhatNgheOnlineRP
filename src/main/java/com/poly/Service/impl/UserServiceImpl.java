@@ -20,58 +20,64 @@ import com.poly.Service.UserService;
 
 @Service
 public class UserServiceImpl implements UserService, UserDetailsService {
-	@Autowired
-	private UserRepository userRepository;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserRepository userRepository;
 
-	public List<User> findAll() {
-		return userRepository.findAll();
-	}
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-	@Override
-	public User findByEmail(String email) {
-		return userRepository.findByEmail(email);
-	}
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
 
-	public Optional<User> findById(Integer id) {
-		return userRepository.findById(id);
-	}
+    @Override
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
 
-	public User save(User user) {
-		return userRepository.save(user);
-	}
+    public Optional<User> findById(Integer id) {
+        return userRepository.findById(id);
+    }
 
-	public void deleteById(Integer id) {
-		userRepository.deleteById(id);
-	}
+    public User save(User user) {
+        return userRepository.save(user);
+    }
 
-	// auth
-	@Override
-	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		User user = userRepository.findByEmail(email);
-		if (user == null) {
-			throw new UsernameNotFoundException("Không tìm thấy người dùng");
-		}
-		return new CustomUserDetails(user);
-	}
+    public void deleteById(Integer id) {
+        userRepository.deleteById(id);
+    }
 
-	@Override
-	public boolean register(RegisterRequest request) {
-		if (userRepository.existsByEmail(request.getEmail())) {
-			return false;
-		}
+    // auth
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UsernameNotFoundException("Không tìm thấy người dùng");
+        }
+        return new CustomUserDetails(user);
+    }
 
-		User user = new User();
-		user.setEmail(request.getEmail());
-		user.setFullName(request.getFirstName() + " " + request.getLastName());
-		user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-		user.setRole("Customer");
-		user.setCreatedAt(LocalDateTime.now());
+    @Override
+    public boolean register(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            return false;
+        }
 
-		userRepository.save(user);
-		return true;
-	}
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setFullName(request.getFirstName() + " " + request.getLastName());
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setRole("Customer");
+        user.setCreatedAt(LocalDateTime.now());
+
+        userRepository.save(user);
+        return true;
+    }
+
+    @Override
+    public List<User> findByRole(String role) {
+        return userRepository.findByRole(role);
+    }
 
 }

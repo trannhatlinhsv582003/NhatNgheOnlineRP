@@ -1,0 +1,139 @@
+<!-- Modal Chi tiết đơn -->
+<div class="modal fade" id="orderModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chi tiết đơn hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="orderDetailContent">Đang tải...</div>
+            </div>
+            <div class="modal-footer d-flex justify-content-between" id="orderActionButtons">
+                <button class="btn btn-success px-4 fw-bold" onclick="confirmUpdate('Delivered')">Đã giao hàng</button>
+                <div>
+                    <button class="btn btn-outline-dark me-2" onclick="confirmUpdate('Returned')">Trả hàng</button>
+                    <button class="btn btn-outline-danger" onclick="confirmUpdate('Cancelled')">Hủy đơn</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentOrderId = null;
+
+    function openOrderDetail(card) {
+        currentOrderId = card.getAttribute("data-id");
+        const content = document.getElementById("orderDetailContent");
+        const actionButtons = document.getElementById("orderActionButtons");
+
+        content.innerHTML = "Đang tải...";
+        actionButtons.classList.add("d-none");
+
+        fetch(`/api/orders/${currentOrderId}`)
+            .then(res => {
+                if (!res.ok) return res.text().then(msg => { throw new Error(msg); });
+                return res.json();
+            })
+            .then(data => {
+                const itemsHtml = data.orderItems.map(item => `
+                    <tr>
+                        <td>${item.product.productName}</td>
+                        <td>${item.quantity}</td>
+                        <td>${item.price.toLocaleString()} đ</td>
+                        <td>${(item.price * item.quantity).toLocaleString()} đ</td>
+                    </tr>
+                `).join("");
+
+                content.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Mã đơn:</strong> ${data.orderID}</p>
+                            <p><strong>Ngày đặt:</strong> ${new Date(data.orderDate).toLocaleString()}</p>
+                            <p><strong>Trạng thái:</strong> ${getStatusBadge(data.status)}</p>
+
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Người đặt:</strong> ${data.user.fullName}</p>
+                            <p><strong>SĐT:</strong> ${data.user.phone}</p>
+                            <p><strong>Địa chỉ:</strong> ${data.user.address}</p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h6>Danh sách sản phẩm</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th>Số lượng</th>
+                                    <th>Đơn giá</th>
+                                    <th>Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${itemsHtml}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="text-end mt-3">
+                        <strong>Tổng tiền:</strong> ${data.totalAmount.toLocaleString()} đ
+                    </div>
+                `;
+
+                const doneStatuses = ["Delivered", "Cancelled", "Returned"];
+                if (!doneStatuses.includes(data.status)) {
+                    actionButtons.classList.remove("d-none");
+                }
+            })
+            .catch(err => {
+                content.innerHTML = `<div class="text-danger">Không thể tải thông tin đơn hàng: ${err.message}</div>`;
+            });
+    }
+
+    function confirmUpdate(newStatus) {
+        if (!currentOrderId) return;
+
+        let message = {
+            "Delivered": "Xác nhận đã giao đơn này?",
+            "Cancelled": "Bạn có chắc muốn hủy đơn?",
+            "Returned": "Xác nhận trả hàng?"
+        }[newStatus];
+
+        if (!confirm(message)) return;
+
+        fetch("/shipper/update-status", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `orderID=${currentOrderId}&status=${newStatus}`
+        })
+            .then(res => {
+                if (!res.ok) return res.text().then(msg => { throw new Error(msg); });
+                return res.text();
+            })
+            .then(msg => {
+                alert(msg);
+                location.reload();
+            })
+            .catch(err => {
+                alert("Lỗi: " + err.message);
+            });
+    }
+
+    function getStatusBadge(status) {
+        const statusMap = {
+            "Pending": `<span class="badge bg-warning text-dark">Chờ xác nhận</span>`,
+            "Paid": `<span class="badge bg-primary">Đã thanh toán</span>`,
+            "Shipping": `<span class="badge bg-info text-dark">Đang giao</span>`,
+            "Delivered": `<span class="badge bg-success">Đã giao</span>`,
+            "Returned": `<span class="badge bg-secondary">Trả hàng</span>`,
+            "Cancelled": `<span class="badge bg-danger">Đã hủy</span>`
+        };
+        return statusMap[status] || `<span class="badge bg-dark">${status}</span>`;
+    }
+
+</script>

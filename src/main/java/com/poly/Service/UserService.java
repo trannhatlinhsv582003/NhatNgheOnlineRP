@@ -12,18 +12,21 @@ import com.poly.Model.User;
 
 @Service
 public interface UserService {
-	List<User> findAll();
 
-	Optional<User> findById(Integer id);
+    List<User> findAll();
 
-	User findByEmail(String email);
+    Optional<User> findById(Integer id);
 
-	User save(User user);
+    User findByEmail(String email);
 
-	void deleteById(Integer id);
+    User save(User user);
 
-	// auth
-	UserDetails loadUserByUsername(String email);
+    void deleteById(Integer id);
 
-	boolean register(RegisterRequest request);
+    // auth
+    UserDetails loadUserByUsername(String email);
+
+    boolean register(RegisterRequest request);
+
+    List<User> findByRole(String role);
 }

@@ -19,6 +19,7 @@ import com.poly.Model.User;
 import com.poly.Repository.OrderItemRepository;
 import com.poly.Repository.OrderRepository;
 import com.poly.Repository.ProductRepository;
+import com.poly.Repository.UserRepository;
 import com.poly.Service.OrderService;
 
 import jakarta.transaction.Transactional;
@@ -33,6 +34,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     public List<Order> findAll() {
         return orderRepository.findAll();
@@ -103,4 +107,15 @@ public class OrderServiceImpl implements OrderService {
         Integer total = orderItemRepository.getTotalCancelledQuantity();
         return total != null ? total : 0;
     }
+
+    @Override
+    public List<User> findByRole(String role) {
+        return userRepository.findByRole(role);
+    }
+
+    @Override
+    public List<Order> findByShipper(User shipper) {
+        return orderRepository.findByShipper(shipper);
+    }
+
 }

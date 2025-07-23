@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -30,6 +31,10 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "UserID", nullable = false)
+    @JsonIgnoreProperties({
+        "passwordHash", "email", "role", "birthDay", "createdAt",
+        "lastLogin", "lastAction", "lastIP", "imageUrl"
+    })
     private User user;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -40,12 +45,23 @@ public class Order {
     private String status;
 
     private String trackingCode;
+
     private String shippingAddress;
 
+    @ManyToOne
+    @JoinColumn(name = "ShipperID")
+    @JsonIgnoreProperties({
+        "passwordHash", "email", "role", "birthDay", "createdAt",
+        "lastLogin", "lastAction", "lastIP", "imageUrl"
+    })
+    private User shipper;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("order") // tránh vòng lặp ngược
     private List<OrderItem> orderItems;
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("order") // tránh vòng lặp ngược
     private Payment payment;
 
     public BigDecimal getTotalAmount() {
@@ -53,8 +69,8 @@ public class Order {
             return BigDecimal.ZERO;
         }
 
-        return orderItems.stream().map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+        return orderItems.stream()
+                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
-
 }

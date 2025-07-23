@@ -1,0 +1,32 @@
+<div class="container py-4">
+    <h4 class="mb-4">Đơn hàng của bạn</h4>
+    <div class="row g-3">
+        <div class="col-md-6 md-3" th:each="order : ${orders}">
+            <div class="card shadow-sm" role="button" data-bs-toggle="modal" data-bs-target="#orderModal"
+                th:attr="data-id=${order.orderID}" onclick="openOrderDetail(this)">
+                <div class="card-body">
+                    <h5 class="card-title">Mã đơn: <span th:text="${order.orderID}"></span></h5>
+                    <p class="card-text mb-1"><strong>Người đặt:</strong> <span th:text="${order.user.fullName}"></span>
+                    </p>
+                    <p class="card-text mb-1"><strong>Địa chỉ:</strong> <span th:text="${order.user.address}"></span>
+                    </p>
+                    <p class="card-text mb-1"><strong>Ngày đặt:</strong> <span
+                            th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}"></span></p>
+                    <p class="card-text">
+                        <strong>Trạng thái:</strong>
+                        <span th:switch="${order.status}">
+                            <span th:case="'Pending'" class="badge bg-warning text-dark">Chờ xác nhận</span>
+                            <span th:case="'Paid'" class="badge bg-primary">Đã thanh toán</span>
+                            <span th:case="'Shipping'" class="badge bg-info text-dark">Đang giao</span>
+                            <span th:case="'Delivered'" class="badge bg-success">Đã giao xong</span>
+                            <span th:case="'Returned'" class="badge bg-secondary">Trả hàng</span>
+                            <span th:case="'Cancelled'" class="badge bg-danger">Đã hủy</span>
+                            <span th:case="*" class="badge bg-dark" th:text="${order.status}">Khác</span>
+                        </span>
+                    </p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

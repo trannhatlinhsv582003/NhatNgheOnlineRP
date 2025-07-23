@@ -22,7 +22,9 @@ import com.poly.DTO.OrderItemDTO;
 import com.poly.DTO.ProductDTO;
 import com.poly.DTO.UserDTO;
 import com.poly.Model.Order;
+import com.poly.Model.User;
 import com.poly.Service.OrderService;
+import com.poly.Service.UserService;
 
 @Controller
 @RequestMapping("/admin/order")
@@ -30,6 +32,8 @@ public class AdminOrderController {
 
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private UserService userService;
 
     @GetMapping
     public String orderPage(Model model,
@@ -45,6 +49,9 @@ public class AdminOrderController {
 
         model.addAttribute("startPage", Math.max(0, page - 2));
         model.addAttribute("endPage", Math.min(orderPage.getTotalPages() - 1, page + 2));
+
+        List<User> shippers = userService.findByRole("Shipper");
+        model.addAttribute("shippers", shippers);
 
         model.addAttribute("order", new Order());
         return "admin/order/index";
@@ -96,4 +103,33 @@ public class AdminOrderController {
         });
         return "redirect:/admin/order";
     }
+
+    @PostMapping("/assign-shipper")
+    public String assignShipper(@RequestParam Integer orderID, @RequestParam Integer shipperID) {
+        Optional<Order> opt = orderService.findById(orderID);
+
+        if (opt.isPresent()) {
+            Order order = opt.get();
+
+            if (shipperID == 0) {
+                // Hủy gán: xóa shipper và KHÔNG đổi trạng thái
+                order.setShipper(null);
+            } else {
+                Optional<User> shipperOpt = userService.findById(shipperID);
+                if (shipperOpt.isPresent()) {
+                    order.setShipper(shipperOpt.get());
+
+                    // Nếu đơn đang ở trạng thái "Pending" thì chuyển sang "Shipping"
+                    if ("Pending".equalsIgnoreCase(order.getStatus())) {
+                        order.setStatus("Shipping");
+                    }
+                }
+            }
+
+            orderService.save(order);
+        }
+
+        return "redirect:/admin/order";
+    }
+
 }

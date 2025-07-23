@@ -36,4 +36,8 @@ public interface OrderService {
     int getTotalSoldProducts();
 
     int getTotalCancelledProducts();
+
+    List<User> findByRole(String role);
+
+    List<Order> findByShipper(User shipper);
 }
