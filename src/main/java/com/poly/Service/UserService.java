@@ -29,4 +29,12 @@ public interface UserService {
     boolean register(RegisterRequest request);
 
     List<User> findByRole(String role);
+
+    //OTP
+    void sendOtpToEmail(String email);
+
+    boolean verifyOtp(String email, String otp);
+
+    void updatePassword(String email, String newPassword);
+
 }
