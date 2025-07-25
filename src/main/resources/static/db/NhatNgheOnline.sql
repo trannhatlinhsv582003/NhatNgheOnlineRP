@@ -25,8 +25,8 @@ CREATE TABLE Users (
     Address NVARCHAR(255),
     Phone NVARCHAR(20),
     Gender BIT DEFAULT 1,
-    BirthDay DATE,  
-    Role NVARCHAR(20) NOT NULL CHECK (Role IN ('Customer', 'Staff', 'Admin')),
+    BirthDay DATE,
+    Role NVARCHAR(20) NOT NULL CHECK (Role IN ('Customer', 'Staff', 'Admin', 'Shipper')),
     CreatedAt DATETIME DEFAULT GETDATE(),
     ImageURL NVARCHAR(255),
     LastLogin DATETIME NULL,
@@ -105,7 +105,9 @@ CREATE TABLE Orders (
     Status NVARCHAR(50) NOT NULL DEFAULT N'Pending',
     TrackingCode NVARCHAR(100),
     ShippingAddress NVARCHAR(255),
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE ON UPDATE CASCADE
+	ShipperID INT NULL DEFAULT NULL,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE ON UPDATE CASCADE,
+	 FOREIGN KEY (ShipperID) REFERENCES Users(UserID)
 );
 
 ---------------------------------------------------------
@@ -129,7 +131,7 @@ CREATE TABLE Payments (
     OrderID INT NOT NULL UNIQUE,
     PaymentMethodID INT NOT NULL,
     PaymentDate DATETIME DEFAULT GETDATE(),
-    PaymentStatus NVARCHAR(50) NOT NULL DEFAULT N'Chưa thanh toán',
+    PaymentStatus NVARCHAR(50) NOT NULL DEFAULT N'Pending',
     TransactionID NVARCHAR(100),
     PaymentNote NVARCHAR(500),
     FOREIGN KEY (OrderID) REFERENCES Orders(OrderID) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -152,7 +154,20 @@ CREATE TABLE Reviews (
 );
 
 ---------------------------------------------------------
--- 11. Indexes
+-- 11. Bảng OTP
+---------------------------------------------------------
+CREATE TABLE otp_token (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    email NVARCHAR(255) NOT NULL,
+    otp NVARCHAR(6) NOT NULL,
+    created_at DATETIME2 NOT NULL,
+    verified BIT NOT NULL
+);
+
+
+
+---------------------------------------------------------
+-- Indexes
 ---------------------------------------------------------
 CREATE INDEX IX_Products_CategoryID ON Products(CategoryID);
 CREATE INDEX IX_Carts_UserID ON Carts(UserID);
@@ -161,7 +176,7 @@ CREATE INDEX IX_OrderItems_OrderID ON OrderItems(OrderID);
 CREATE INDEX IX_Reviews_ProductID ON Reviews(ProductID);
 
 ---------------------------------------------------------
--- 12. Dữ liệu mẫu: Phương thức thanh toán
+-- Dữ liệu mẫu: Phương thức thanh toán
 ---------------------------------------------------------
 INSERT INTO PaymentMethods (Code, Name, Description, IconURL) VALUES
 ('cod', N'Thanh toán khi giao hàng', N'Thanh toán tiền mặt khi nhận hàng', '/images/icons/cod.png'),
@@ -184,7 +199,11 @@ VALUES
 
 (N'admin', 'admin@gmail.com', 
  '$2a$10$QrH8eF0Id3Bbm4culTnPxeALKmbtqOzbfSz6Jn5dqt7rAmz9KKjx2',  -- admin@gmail.com | 123
- N'789 Đường C, Quận 5, TP.HCM', '0933123456', 1, '1985-03-15', 'Admin', NULL);
+ N'789 Đường C, Quận 5, TP.HCM', '0933123456', 1, '1985-03-15', 'Admin', NULL),
+
+ (N'Shipper Nguyễn Văn A', 'shipper@gmail.com',
+ '$2a$10$QrH8eF0Id3Bbm4culTnPxeALKmbtqOzbfSz6Jn5dqt7rAmz9KKjx2', -- shipper@gmail.com | 123
+ N'Kho B, TP.HCM', '0988123456', 1, '1992-10-10', 'Shipper', NULL);
 
 
 -- Bảng Danh Mục
