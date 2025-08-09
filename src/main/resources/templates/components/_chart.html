@@ -1,0 +1,100 @@
+<div th:fragment="chart">
+    <div class="bg-white rounded shadow-sm p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="fw-bold mb-0">Đơn hàng và Doanh thu (All time)</h5>
+            <small class="text-muted">Chỉ tính trạng thái: Paid &amp; Delivered</small>
+        </div>
+        <canvas id="ordersRevenueAllTime" style="height: 260px"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script>
+        (async function () {
+            const res = await fetch('/admin/api/charts/orders-revenue-alltime');
+            const data = await res.json();
+
+            const labels = data.map(x => x.label);
+            const orders = data.map(x => x.orders);
+            const revenue = data.map(x => x.revenue);
+
+            const canvas = document.getElementById('ordersRevenueAllTime');
+            const ctx = canvas.getContext('2d');
+
+            // Gradient đỏ nhạt cho Revenue
+            const grad = ctx.createLinearGradient(0, 0, 0, canvas.offsetHeight || 260);
+            grad.addColorStop(0, 'rgba(239, 68, 68, 0.25)');
+            grad.addColorStop(1, 'rgba(239, 68, 68, 0.02)');
+
+            new Chart(ctx, {
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            type: 'line',
+                            label: 'Orders',
+                            data: orders,
+                            yAxisID: 'y',
+                            borderColor: '#3b82f6',          // xanh dương
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            tension: 0.35,
+                            pointRadius: 0,
+                            pointHoverRadius: 4
+                        },
+                        {
+                            type: 'line',
+                            label: 'Revenue',
+                            data: revenue,
+                            yAxisID: 'y1',
+                            borderColor: '#ef4444',          // đỏ
+                            backgroundColor: grad,           // fill nhẹ
+                            fill: true,
+                            borderWidth: 2,
+                            tension: 0.35,
+                            pointRadius: 0,
+                            pointHoverRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            padding: 10,
+                            backgroundColor: 'rgba(17,24,39,0.9)',
+                            callbacks: {
+                                label: (ctx) => ctx.dataset.yAxisID === 'y1'
+                                    ? `Revenue: ${Number(ctx.parsed.y || 0).toLocaleString('vi-VN')}₫`
+                                    : `Orders: ${ctx.parsed.y}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: { maxRotation: 0, autoSkip: true }
+                        },
+                        y: {
+                            title: { display: true, text: 'Orders' },
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        },
+                        y1: {
+                            position: 'right',
+                            title: { display: true, text: 'Revenue (₫)' },
+                            grid: { drawOnChartArea: false },
+                            beginAtZero: true,
+                            ticks: {
+                                callback: (v) => Number(v).toLocaleString('vi-VN')
+                            }
+                        }
+                    },
+                    elements: { line: { capBezierPoints: true } }
+                }
+            });
+        })();
+    </script>
+</div>

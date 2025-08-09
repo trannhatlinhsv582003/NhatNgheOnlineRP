@@ -71,8 +71,11 @@
 
 					<!-- Row 2: Top bán chạy + đánh giá gần đây -->
 					<div class="row g-4">
-						<!-- Đánh giá gần đây -->
 						<div class="col-md-6">
+							<!-- Chart -->
+							<div th:replace="components/_chart :: chart"></div>
+
+							<!-- Đánh giá gần đây -->
 							<div class="bg-white rounded shadow-sm p-4">
 								<h5 class="fw-bold mb-3">Đánh giá gần đây</h5>
 								<ul class="list-group list-group-flush">
