@@ -1,0 +1,164 @@
+<div class="table-responsive mt-4">
+    <table class="table table-bordered align-middle text-center">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Khách hàng</th>
+                <th>Shipper</th>
+                <th>Ngày đặt</th>
+                <th>Phương thức</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="order : ${orders}" th:data-id="${order.orderID}">
+                <td th:text="${order.orderID}"></td>
+                <td th:text="${order.user.fullName}"></td>
+                <td th:text="${order.shipper != null ? order.shipper.fullName : 'Chưa gán'}"></td>
+                <td th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}"></td>
+                <td th:text="${order.payment != null ? order.payment.paymentMethod.name : 'Chưa thanh toán'}"></td>
+
+                <td>
+                    <span th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
+                </td>
+                <td>
+                    <span th:switch="${order.status}">
+                        <span th:case="'Pending'" class="badge bg-warning text-dark">Chờ xác nhận</span>
+                        <span th:case="'Paid'" class="badge bg-primary">Đã thanh toán</span>
+                        <span th:case="'Shipping'" class="badge bg-info text-dark">Đang giao</span>
+                        <span th:case="'Delivered'" class="badge bg-success">Đã giao</span>
+                        <span th:case="'Returned'" class="badge bg-secondary">Trả hàng</span>
+                        <span th:case="'Cancelled'" class="badge bg-danger">Đã hủy</span>
+                        <span th:case="*" class="badge bg-secondary" th:text="${order.status}">Khác</span>
+                    </span>
+
+
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-warning btn-assign-shipper" type="button"
+                        th:data-id="${order.orderID}"
+                        th:data-shipper-id="${order.shipper != null ? order.shipper.userID : 0}">
+                        <i class="bi bi-truck"></i>
+                    </button>
+                    <button class="btn btn-sm btn-primary btn-view" type="button">
+                        <i class="bi bi-eye-fill"></i>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4">
+        <form method="get" class="d-flex align-items-center gap-2 mb-3">
+            <label for="pageSize" class="form-label m-0">Hiển thị</label>
+            <select class="form-select form-select-sm w-auto" name="size" id="pageSize" onchange="this.form.submit()">
+                <option th:value="5" th:selected="${pageSize == 5}">5</option>
+                <option th:value="10" th:selected="${pageSize == 10}">10</option>
+                <option th:value="20" th:selected="${pageSize == 20}">20</option>
+                <option th:value="50" th:selected="${pageSize == 50}">50</option>
+            </select>
+            <span class="ms-2">đơn hàng/trang</span>
+        </form>
+
+        <nav>
+            <ul class="pagination pagination-sm mb-0 shadow-sm rounded overflow-hidden">
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link" th:href="@{'/admin/order?page=' + ${currentPage - 1} + '&size=' + ${pageSize}}"
+                        aria-label="Trước">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+
+                <li class="page-item" th:if="${startPage > 0}">
+                    <a class="page-link" th:href="@{'/admin/order?page=0&size=' + ${pageSize}}">1</a>
+                </li>
+                <li class="page-item disabled" th:if="${startPage > 1}">
+                    <span class="page-link">...</span>
+                </li>
+
+                <li th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                    th:classappend="${i == currentPage} ? 'active'" class="page-item">
+                    <a class="page-link" th:href="@{'/admin/order?page=' + ${i} + '&size=' + ${pageSize}}"
+                        th:text="${i + 1}"></a>
+                </li>
+
+                <li class="page-item disabled" th:if="${endPage < totalPages - 2}">
+                    <span class="page-link">...</span>
+                </li>
+                <li class="page-item" th:if="${endPage < totalPages - 1}">
+                    <a class="page-link"
+                        th:href="@{'/admin/order?page=' + (${totalPages - 1}) + '&size=' + ${pageSize}}"
+                        th:text="${totalPages}"></a>
+                </li>
+
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                    <a class="page-link" th:href="@{'/admin/order?page=' + ${currentPage + 1} + '&size=' + ${pageSize}}"
+                        aria-label="Sau">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+<!-- Modal Gán Shipper -->
+<div class="modal fade" id="assignShipperModal" tabindex="-1" aria-labelledby="assignShipperModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="post" th:action="@{/admin/order/assign-shipper}">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Gán Shipper cho đơn hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="orderID" id="assignOrderID">
+                    <div class="mb-3">
+                        <label for="shipperID" class="form-label">Chọn Shipper:</label>
+                        <select class="form-select" name="shipperID" id="shipperID" required>
+                            <option value="" disabled selected>-- Chọn shipper --</option>
+                            <option value="0">-- Hủy gán shipper --</option>
+                            <option th:each="shipper : ${shippers}" th:value="${shipper.userID}"
+                                th:text="${shipper.fullName}" th:selected="${shipper.userID == selectedShipperID}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Gán</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const assignButtons = document.querySelectorAll(".btn-assign-shipper");
+        const shipperSelect = document.getElementById("shipperID");
+
+        assignButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                const orderId = this.getAttribute("data-id");
+                const currentShipperId = this.getAttribute("data-shipper-id");
+
+                // Gán orderID vào input hidden
+                document.getElementById("assignOrderID").value = orderId;
+
+                // Đặt lại lựa chọn trong dropdown shipper
+                Array.from(shipperSelect.options).forEach(option => {
+                    option.selected = option.value === currentShipperId;
+                });
+
+                // Hiển thị modal
+                const modal = new bootstrap.Modal(document.getElementById("assignShipperModal"));
+                modal.show();
+            });
+        });
+    });
+</script>

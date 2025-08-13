@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>QR Pay</title>
+    <link rel="stylesheet" th:href="@{/libraries/bootstrap-5.3.3-dist/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="container py-5 text-center">
+    <h2 class="mb-4 text-success">Quét mã VietQR để thanh toán</h2>
+    <p class="mb-3"><strong>Thông tin chuyển khoản:</strong></p>
+    <p class="text-muted" th:text="${info}"></p>
+    <img th:src="${qrUrl}" alt="QR Payment" class="img-fluid mb-3" style="max-width: 280px;">
+    <div class="mt-4">
+        <a th:href="@{/}" class="btn btn-secondary">Trang chủ</a>
+        <a th:href="@{/cart/result(orderId=${order.orderID})}" class="btn btn-primary">Tôi đã thanh toán</a>
+    </div>
+</div>
+</body>
+</html>

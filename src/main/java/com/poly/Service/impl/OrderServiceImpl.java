@@ -1,0 +1,143 @@
+// OrderServiceImpl.java
+package com.poly.Service.impl;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import com.poly.Model.Cart;
+import com.poly.Model.Order;
+import com.poly.Model.OrderItem;
+import com.poly.Model.Product;
+import com.poly.Model.User;
+import com.poly.Repository.OrderItemRepository;
+import com.poly.Repository.OrderRepository;
+import com.poly.Repository.ProductRepository;
+import com.poly.Repository.UserRepository;
+import com.poly.Service.OrderService;
+
+import jakarta.transaction.Transactional;
+
+@Service
+public class OrderServiceImpl implements OrderService {
+
+    @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
+    private OrderItemRepository orderItemRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    public List<Order> findAll() {
+        return orderRepository.findAll();
+    }
+
+    public Optional<Order> findById(Integer id) {
+        return orderRepository.findById(id);
+    }
+
+    public Order save(Order order) {
+        return orderRepository.save(order);
+    }
+
+    public void deleteById(Integer id) {
+        orderRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public Order createOrder(User user, String shippingAddress, List<Cart> cartItems) {
+        Order order = new Order();
+        order.setUser(user);
+        order.setOrderDate(LocalDateTime.now());
+        order.setStatus("Pending");
+        order.setShippingAddress(shippingAddress);
+        return orderRepository.save(order);
+    }
+
+    @Override
+    public void saveOrderItem(OrderItem item) {
+        // Giảm số lượng tồn kho
+        Product product = item.getProduct();
+        int currentStock = product.getStockQuantity();
+        product.setStockQuantity(currentStock - item.getQuantity());
+        productRepository.save(product);
+
+        // Lưu OrderItem
+        orderItemRepository.save(item);
+    }
+
+    @Override
+    public Page<Order> searchOrders(String keyword, Pageable pageable) {
+        if (keyword == null || keyword.isBlank()) {
+            return orderRepository.findAll(pageable);
+        }
+        return orderRepository.findByUserFullNameContainingIgnoreCase(keyword, pageable);
+    }
+
+    @Override
+    public Page<Order> findAll(Pageable pageable) {
+        return orderRepository.findAll(pageable);
+    }
+
+    @Override
+    public BigDecimal getTotalRevenue() {
+        BigDecimal revenue = orderRepository.getTotalRevenue();
+        return revenue != null ? revenue : BigDecimal.ZERO;
+    }
+
+    @Override
+    public int getTotalSoldProducts() {
+        Integer total = orderItemRepository.getTotalSoldQuantity();
+        return total != null ? total : 0;
+    }
+
+    @Override
+    public int getTotalCancelledProducts() {
+        Integer total = orderItemRepository.getTotalCancelledQuantity();
+        return total != null ? total : 0;
+    }
+
+    @Override
+    public List<User> findByRole(String role) {
+        return userRepository.findByRole(role);
+    }
+
+    @Override
+    public List<Order> findByShipper(User shipper) {
+        return orderRepository.findByShipper(shipper);
+    }
+    
+    @Override
+    public List<Map<String, Object>> getOrderStatusStatistics() {
+        List<Order> allOrders = orderRepository.findAll();
+        
+        // Đếm số lượng đơn hàng theo từng trạng thái
+        long pending = allOrders.stream().filter(o -> "Pending".equals(o.getStatus())).count();
+        long paid = allOrders.stream().filter(o -> "Paid".equals(o.getStatus())).count();
+        long shipping = allOrders.stream().filter(o -> "Shipping".equals(o.getStatus())).count();
+        long delivered = allOrders.stream().filter(o -> "Delivered".equals(o.getStatus())).count();
+        long returned = allOrders.stream().filter(o -> "Returned".equals(o.getStatus())).count();
+        long cancelled = allOrders.stream().filter(o -> "Cancelled".equals(o.getStatus())).count();
+        
+        return List.of(
+            Map.of("status", "Chờ xác nhận", "count", pending, "color", "#FFC107"),
+            Map.of("status", "Đã thanh toán", "count", paid, "color", "#0D6EFD"),
+            Map.of("status", "Đang giao", "count", shipping, "color", "#0DCAF0"),
+            Map.of("status", "Đã giao", "count", delivered, "color", "#198754"),
+            Map.of("status", "Trả hàng", "count", returned, "color", "#6C757D"),
+            Map.of("status", "Đã hủy", "count", cancelled, "color", "#DC3545")
+        );
+    }
+}

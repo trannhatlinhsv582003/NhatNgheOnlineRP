@@ -1,0 +1,125 @@
+<!-- Modal Đăng ký -->
+<div class="modal fade" id="registerModal" tabindex="-1"
+	aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content rounded-4">
+			<div class="modal-header border-0 flex-column text-center">
+				<!-- Tiêu đề -->
+				<!-- <h5 class="modal-title fw-bold w-100">ĐĂNG KÝ TÀI KHOẢN</h5> -->
+
+				<!-- Nút đóng ở góc phải -->
+				<button type="button"
+					class="btn-close position-absolute top-0 end-0 m-3"
+					data-bs-dismiss="modal" aria-label="Close"></button>
+
+				<!-- Logo căn giữa -->
+				<div class="w-100 d-flex justify-content-center mt-2">
+					<img src="/images/logo/logo_landscape.png" alt="Logo" width="150"
+						height="50">
+				</div>
+			</div>
+
+
+
+			<div class="modal-body">
+				<div class="mb-2">
+					<input type="email" class="form-control" id="registerEmail"
+						placeholder="Email">
+					<div class="invalid-feedback" id="registerEmailError"></div>
+				</div>
+				<div class="mb-2">
+					<input type="text" class="form-control" id="registerFirstName"
+						placeholder="Họ">
+					<div class="invalid-feedback" id="registerFirstNameError"></div>
+				</div>
+				<div class="mb-2">
+					<input type="text" class="form-control" id="registerLastName"
+						placeholder="Tên">
+					<div class="invalid-feedback" id="registerLastNameError"></div>
+				</div>
+				<div class="mb-3">
+					<input type="password" class="form-control" id="registerPassword"
+						placeholder="Mật khẩu">
+					<div class="invalid-feedback" id="registerPasswordError"></div>
+				</div>
+
+
+				<button class="btn btn-danger w-100 fw-bold mb-3">TẠO TÀI
+					KHOẢN</button>
+
+				<div class="text-center text-muted my-2">
+					<hr>
+					<span class="position-relative px-3 bg-white" style="top: -22px;">hoặc
+						đăng ký bằng</span>
+				</div>
+
+				<div class="d-flex gap-2 mb-3">
+					<button class="btn btn-outline-danger flex-fill">
+						<i class="bi bi-google me-2"></i>Google
+					</button>
+					<button class="btn btn-outline-primary flex-fill">
+						<i class="bi bi-facebook me-2"></i>Facebook
+					</button>
+				</div>
+
+				<p class="text-center small">
+					Bạn đã có tài khoản? <a href="#" class="text-primary fw-semibold"
+						data-bs-dismiss="modal" data-bs-toggle="modal"
+						data-bs-target="#loginModal">Đăng nhập!</a>
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+document.querySelector('#registerModal .btn.btn-danger').addEventListener('click', function () {
+    // Clear previous error states
+    ['Email', 'FirstName', 'LastName', 'Password'].forEach(field => {
+        document.getElementById(`register${field}`).classList.remove('is-invalid');
+        document.getElementById(`register${field}Error`).innerText = '';
+    });
+
+    const email = document.getElementById('registerEmail').value.trim();
+    const firstName = document.getElementById('registerFirstName').value.trim();
+    const lastName = document.getElementById('registerLastName').value.trim();
+    const password = document.getElementById('registerPassword').value;
+
+    fetch('/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, firstName, lastName, password })
+    })
+    .then(async res => {
+        if (!res.ok) {
+            const errors = await res.json();
+            for (const field in errors) {
+                const key = 'register' + field.charAt(0).toUpperCase() + field.slice(1);
+                document.getElementById(key).classList.add('is-invalid');
+                document.getElementById(key + 'Error').innerText = errors[field];
+            }
+        } else {
+            const msg = await res.json();
+            bootstrap.Modal.getInstance(document.getElementById('registerModal')).hide();
+
+            // Dùng modal tuỳ chỉnh để hiện thông báo thành công
+            showCustomMessage({
+                title: "Chúc mừng!",
+                message: msg.message || "Đăng ký thành công!",
+                type: "success"
+            });
+        }
+    })
+    .catch(err => {
+        // Dùng modal tuỳ chỉnh để hiện lỗi
+        showCustomMessage({
+            title: "Lỗi",
+            message: "Có lỗi xảy ra khi đăng ký. Vui lòng thử lại sau.",
+            type: "error"
+        });
+    });
+
+});
+
+</script>
+

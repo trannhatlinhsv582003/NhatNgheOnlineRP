@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<link rel="shortcut icon" type="x-icon" th:href="@{/images/logo/logo.png}">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Giỏ hàng của tôi</title>
+
+	<!-- Bootstrap -->
+	<link rel="stylesheet" th:href="@{/libraries/bootstrap-5.3.3-dist/css/bootstrap.min.css}">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+	<!-- CSS Custom -->
+	<link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+
+<body>
+
+	<!-- HEADER -->
+	<header class="row">
+		<div th:replace="/components/_menu.html"></div>
+	</header>
+
+	<!-- BODY -->
+	<div class="container py-4 col-5">
+		<!-- Quay lại -->
+		<div class="mb-2">
+			<a href="/" class="text-decoration-none small"><i class="bi bi-chevron-left"></i> Trở về trang chủ</a>
+		</div>
+		<div class="container my-5 mt-0 bg-white p-4 rounded shadow-sm">
+			<!-- Progress -->
+			<div class="bg-danger bg-opacity-10 rounded p-3 mb-4">
+				<div class="d-flex justify-content-between text-center">
+					<div class="flex-fill">
+						<i class="bi bi-cart-fill fs-4 text-danger"></i>
+						<div class="fw-bold text-danger">Giỏ hàng</div>
+					</div>
+					<div class="flex-fill">
+						<i class="bi bi-card-list fs-4 text-danger"></i>
+						<div class="fw-bold text-danger">Thông tin đặt hàng</div>
+					</div>
+					<div class="flex-fill">
+						<i class="bi bi-credit-card fs-4 text-danger"></i>
+						<div class="fw-bold text-danger">Thanh toán</div>
+					</div>
+					<div class="flex-fill">
+						<i class="bi bi-check2-circle fs-4 text-danger"></i>
+						<div class="fw-bold text-danger">Hoàn tất</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="container d-flex flex-column align-items-center justify-content-center text-center py-5"
+				style="min-height: 80vh">
+				<h4 class="fw-bold mb-4 text-success">ĐẶT HÀNG THÀNH CÔNG!</h4>
+				<img src="/images/order_success.png" alt="Đặt hàng thành công" style="max-width: 180px;" class="mb-4">
+
+				<p class="mb-1 fs-5">
+					Cảm ơn <strong th:text="${order.user.fullName}">Khách hàng</strong>
+					đã đặt hàng!
+				</p>
+				<p class="mb-1">
+					Mã đơn hàng: <strong th:text="${order.orderID}">#ID</strong>
+				</p>
+				<p class="mb-1">
+					Ngày đặt: <strong th:text="${formattedDate}">--</strong>
+				</p>
+				<p class="mb-1">
+					Phương thức thanh toán: <strong th:text="${payment.paymentMethod.name}">COD</strong>
+				</p>
+				<p class="mb-1">
+					Trạng thái thanh toán: <span
+						th:classappend="${payment.paymentStatus == 'Paid'} ? 'text-success fw-bold' : 'text-warning'"
+						th:text="${payment.paymentStatus}">Paid</span>
+				</p>
+
+				<a href="/account/order-history" class="btn btn-outline-primary mt-4">Xem đơn hàng</a>
+
+			</div>
+		</div>
+	</div>
+
+	<!-- FOOTER -->
+	<div th:replace="components/_footer.html"></div>
+
+	<script th:src="@{/libraries/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js}"></script>
+</body>
+
+<script>
+	function scrollToReview() {
+		// Kích hoạt tab "Đánh giá"
+		const tabTrigger = document.querySelector('#review-tab');
+		const tab = new bootstrap.Tab(tabTrigger);
+		tab.show();
+
+		// Scroll đến vị trí tab -100px (do navbar che)
+		const reviewSection = document.querySelector('#productTab');
+		if (reviewSection) {
+			const offsetTop = reviewSection.getBoundingClientRect().top
+				+ window.pageYOffset - 100;
+			window.scrollTo({
+				top: offsetTop,
+				behavior: 'smooth'
+			});
+		}
+	}
+</script>
+
+
+</html>
