@@ -21,18 +21,20 @@
 			<!-- ẢNH SẢN PHẨM -->
 			<div class="col-md-5">
 				<div class="p-3">
+					<!-- Ảnh chính -->
 					<img id="main-image" th:src="@{'/images/products/' + ${product.imageURL}}"
 						class="img-fluid border border-2 rounded" alt="Ảnh sản phẩm">
 
 					<!-- Thumbnail nhỏ -->
-					<div class="mt-3 d-flex gap-2">
-						<img th:src="@{'/images/products/' + ${product.imageURL}}"
-							class="border rounded thumbnail-img active"
-							th:attr="data-src='/images/products/' + ${product.imageURL}" alt=""> <img
-							th:src="@{'/images/products/' + ${product.imageURL}}" class="border rounded thumbnail-img"
-							th:attr="data-src='/images/products/' + ${product.imageURL}" alt=""> <img
-							th:src="@{'/images/products/' + ${product.imageURL}}" class="border rounded thumbnail-img"
+					<div class="mt-3 d-flex gap-2 flex-wrap">
+						<!-- Thumbnail từ ảnh đại diện -->
+						<img th:src="@{'/images/products/' + ${product.imageURL}}" class="border rounded thumbnail-img"
 							th:attr="data-src='/images/products/' + ${product.imageURL}" alt="">
+
+						<!-- Thumbnail từ các ảnh chi tiết -->
+						<img th:each="img : ${product.images}" th:src="@{'/images/products/' + ${img.imageURL}}"
+							class="border rounded thumbnail-img"
+							th:attr="data-src='/images/products/' + ${img.imageURL}" alt="">
 					</div>
 				</div>
 			</div>

@@ -108,7 +108,7 @@
 								class="bi bi-person-fill me-1"></i> Thông tin tài khoản</a></li>
 					<li class="px-3 pb-2 d-flex"><a href="/account/order-history"
 							class="text-black text-decoration-none"><i class="bi bi-clipboard-fill me-1"></i> Đơn hàng
-							của tôi</a></li>
+							của tôi</a></li>	
 					<!-- Chức năng quản lý chỉ hiện nếu là admin hoặc staff -->
 					<li class="px-3 pb-2 d-flex" th:if="${currentUser.role == 'Admin' or currentUser.role == 'Staff'}">
 						<a href="/admin" class="text-black text-decoration-none"><i class="bi bi-gear-fill me-1"></i>
