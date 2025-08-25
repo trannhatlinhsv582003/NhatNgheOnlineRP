@@ -17,7 +17,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     // Lấy 8 sản phẩm ngẫu nhiên theo danh mục (dùng NEWID() cho SQL Server)
     @Query("SELECT p FROM Product p WHERE p.category.categoryName = :categoryName ORDER BY function('NEWID')")
-    List<Product> findTop8ByCategoryNameRandom(@Param("categoryName") String categoryName);
+    List<Product> findTop8ByCategoryNameRandom(@Param("categoryName") String categoryName, Pageable pageable);
 
     // Lấy 4 sản phẩm cùng danh mục, trừ chính nó
     List<Product> findTop4ByCategoryCategoryIDAndProductIDNot(Integer categoryId, Integer productId);

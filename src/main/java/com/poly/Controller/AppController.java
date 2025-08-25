@@ -3,6 +3,7 @@ package com.poly.Controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,10 +27,10 @@ public class AppController {
 	@GetMapping("/")
 	public String home(Model model) {
 		// Tiếp tục phần lấy sản phẩm như cũ
-		model.addAttribute("bestSellerPCs", productRepository.findTop8ByCategoryNameRandom("PC"));
-		model.addAttribute("bestSellerLaptops", productRepository.findTop8ByCategoryNameRandom("Laptop"));
-		model.addAttribute("bestSellerKeyboards", productRepository.findTop8ByCategoryNameRandom("Bàn phím"));
-		model.addAttribute("cheapMonitors", productRepository.findTop8ByCategoryNameRandom("Màn hình"));
+		model.addAttribute("bestSellerPCs", productRepository.findTop8ByCategoryNameRandom("PC", PageRequest.of(0, 8)));
+		model.addAttribute("bestSellerLaptops", productRepository.findTop8ByCategoryNameRandom("Laptop", PageRequest.of(0, 8)));
+		model.addAttribute("bestSellerKeyboards", productRepository.findTop8ByCategoryNameRandom("Bàn phím", PageRequest.of(0, 8)));
+		model.addAttribute("cheapMonitors", productRepository.findTop8ByCategoryNameRandom("Màn hình", PageRequest.of(0, 8)));
 
 		return "home/index";
 	}
